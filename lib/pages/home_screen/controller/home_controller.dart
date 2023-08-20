@@ -53,14 +53,4 @@ class HomeController extends GetxController{
     update();
   }
 
-  getSongImage(int id) async {
-    // DEFAULT: ArtworkFormat.JPEG, 200 and false
-    final OnAudioQuery audioQuery = OnAudioQuery();
-    Uint8List? data = await audioQuery.queryArtwork(
-    id,
-    ArtworkType.AUDIO,
-      quality: 100,
-    );
-    return data;
-  }
 }

@@ -1,10 +1,9 @@
-import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:music_player/constans.dart';
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:music_player/pages/home_screen/widgets/songs_list.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import 'controller/home_controller.dart';
@@ -18,8 +17,26 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kBackBlackColor,
+      appBar: AppBar(
+        backgroundColor: kBackBlackColor,
+        surfaceTintColor: kBackBlackColor,
+        actions: [
+          IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                Icons.search,
+                color: Colors.white,
+              ))
+        ],
+        leading: IconButton(
+            onPressed: () {},
+            icon: const Icon(
+              Icons.menu,
+              color: Colors.white,
+            )),
+      ),
       body: SafeArea(
-        child: GetBuilder<HomeController>(builder: (hController){
+        child: GetBuilder<HomeController>(builder: (hController) {
           return Column(
             children: [
               SingleChildScrollView(
@@ -35,13 +52,77 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                    itemCount: controller.songs.length,
-                    itemBuilder: (context,index){
-                      SongModel song = controller.songs[index];
-                      return songsCard(song);
-                    }),
+                child: controller.selectedFilter == 'Song'
+                    ? SongsList(songs: controller.songs)
+                    : SizedBox(),
+              ),
+              Container(
+                color: kBackBlackColor.withOpacity(1.0),
+                height: 8.h,
+                child: Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    Container(
+                      color: kBackBlackColor,
+                      width: 100.w,
+                      height: 6.h,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: 22.w,
+                          ),
+                          Expanded(child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Another Love',
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                              ),
+                              Text('Tom Odell',
+                                style: TextStyle(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w500,
+                                  color: kTextGreyColor,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 0.5.h,
+                              ),
+                            ],
+                          )),
+                          GestureDetector(
+                            onTap: (){},
+                            child: Icon(Icons.play_arrow,color: Colors.white,size: 8.w,),
+                          ),
+                          SizedBox(
+                            width: 7.w,
+                          ),
+                          GestureDetector(
+                            onTap: (){},
+                            child: Icon(Icons.skip_next,color: kGreyColor,size: 7.w,),
+                          ),
+                          SizedBox(
+                            width: 5.w,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Positioned(
+                        left: 4.w,
+                        bottom: 1.h,
+                        child: CircleAvatar(
+                          radius: 7.w,
+                          foregroundColor: kBlueColor,
+                          backgroundColor: kBlueColor,
+                        )),
+                  ],
+                ),
               ),
             ],
           );
@@ -50,102 +131,26 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget filterContainer({required String title}){
+  Widget filterContainer({required String title}) {
     return GestureDetector(
-        onTap: (){
+        onTap: () {
           controller.setSelectedFilter(title);
         },
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 4.w,vertical: 1.h),
-          margin: EdgeInsets.symmetric(horizontal: 2.w,vertical: 1.h),
+          padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
+          margin: EdgeInsets.symmetric(horizontal: 2.w, vertical: 1.h),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
             color: controller.selectedFilter == title ? kBlueColor : kGreyColor,
           ),
           child: Center(
-            child: Text(title,
-            style: const TextStyle(
-              color: Colors.white,
-            ),
+            child: Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+              ),
             ),
           ),
         ));
-  }
-
-  Widget songsCard(SongModel song){
-    return GestureDetector(
-      onTap: (){},
-      child: Container(
-        width: 90.w,
-        height: 7.h,
-        margin: EdgeInsets.symmetric(vertical: 1.h,horizontal: 5.w),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 6.h,
-              height: 6.h,
-              child: FutureBuilder(future: controller.getSongImage(song.id), builder: (context, AsyncSnapshot snapshot){
-                if(snapshot.connectionState == ConnectionState.done && snapshot.hasData){
-                  Uint8List? data = snapshot.data;
-                  if(data != null){
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: Image.memory(data,
-                      width: 6.h,
-                        height: 6.h,
-                        fit: BoxFit.cover,
-                      ),
-                    );
-                  }
-                  else{
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: Image.asset('assets/images/bd.png',
-                        width: 6.h,
-                        height: 6.h,
-                        fit: BoxFit.cover,
-                      ),
-                    );
-                  }
-                }
-                else{
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Image.asset('assets/images/gd.png',
-                      width: 6.h,
-                      height: 6.h,
-                      fit: BoxFit.cover,
-                    ),
-                  );
-                }
-              }),
-            ),
-            SizedBox(
-              width: 5.w,
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(child: Text(song.title,overflow: TextOverflow.ellipsis,style: TextStyle(color: Colors.white),)),
-                  Expanded(child: Text(song.artist ?? '<unknown>',overflow: TextOverflow.ellipsis,style: TextStyle(color: kTextGreyColor),)),
-                ],
-              ),
-            ),
-            SizedBox(
-              width: 5.w,
-            ),
-            Text(durationGenerator(song.duration ?? 0),style: TextStyle(color: kTextGreyColor),),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String durationGenerator(int duration){
-    int allSeconds = duration ~/ 1000;
-    int min = allSeconds ~/ 60;
-    int second = allSeconds % 60;
-    return '${min < 10 ? '0$min' : min}:${second < 10 ? '0$second' : second}';
   }
 }

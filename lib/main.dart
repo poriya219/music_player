@@ -4,6 +4,7 @@ import 'package:music_player/pages/home_screen/home_screen.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
