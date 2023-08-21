@@ -8,6 +8,7 @@ import 'package:on_audio_query/on_audio_query.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../constans.dart';
+import '../../play_song_screen/play_song_screen.dart';
 
 class SongsList extends StatelessWidget {
   final List<SongModel> songs;
@@ -22,18 +23,17 @@ class SongsList extends StatelessWidget {
         itemCount: songs.length,
         itemBuilder: (context,index){
           SongModel song = songs[index];
-          return songsCard(song);
+          return songsCard(song,index);
         });
   }
 
-  Widget songsCard(SongModel song){
+  Widget songsCard(SongModel song,int index){
     return GestureDetector(
       onTap: (){
         final playerController = Get.put(PlayerController());
-        if(playerController.isPlaying){}
-        else{
-          playerController.initialPlay(path: song.data);
-        }
+          // playerController.initialPlay(path: song.data);
+        Get.to(()=> PlaySongScreen());
+        playerController.sourceListGetter(list: songs,index: index);
       },
       child: Container(
         width: 90.w,
