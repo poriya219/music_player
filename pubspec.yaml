@@ -40,7 +40,8 @@ dependencies:
   responsive_sizer: ^3.2.0
   just_audio: ^0.9.34
   awesome_notifications: ^0.7.4+1
-  http: 0.13.6
+  http: ^1.1.0
+  path_provider: ^2.1.0
 
 dev_dependencies:
   flutter_test:

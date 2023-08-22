@@ -1,11 +1,17 @@
+import 'dart:io';
 import 'dart:isolate';
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:music_player/constans.dart';
+import 'package:music_player/controllers/app_controller.dart';
 import 'package:on_audio_query/on_audio_query.dart';
+import 'package:path_provider/path_provider.dart';
 
 class PlayerController extends GetxController{
 
@@ -48,21 +54,35 @@ class PlayerController extends GetxController{
         // print('====================================================== $list');
       }
       player.setAudioSource(playlist,initialIndex: index);
-      String title = player.sequence![index].tag.title;
-      String artist = player.sequence![index].tag.artist;
-      createNotification(title: title, body: artist);
       player.play();
-      player.currentIndexStream.listen((event) {
+      player.currentIndexStream.listen((event) async{
         setCurrentIndex(player.currentIndex ?? 0);
         String title = player.sequence![player.currentIndex ?? 0].tag.title;
         String artist = player.sequence![player.currentIndex ?? 0].tag.artist;
-        createNotification(title: title, body: artist);
+        QueryArtworkWidget artwork = player.sequence![player.currentIndex ?? 0].tag.artwork;
+        final appController = Get.find<AppController>();
+        print('before listdata:');
+        Uint8List? listData = await appController.getSongImage(artwork.id);
+        print('listdata: $listData');
+        final Directory tempDir = await getTemporaryDirectory();
+        File file = await File('${tempDir.path}/${artwork.id}.png').create();
+        if(listData != null){
+          await file.writeAsBytes(listData);
+        }
+        else{
+          print('null listdata:');
+          final ByteData bytes = await rootBundle.load('assets/images/gd.png');
+          final Uint8List listBytes = bytes.buffer.asUint8List();
+          await file.writeAsBytes(listBytes);
+        }
+        createNotification(title: title, body: artist,path: file.path);
       });
-
     }
   }
 
-  createNotification({required String title, required String body}){
+  createNotification({required String title, required String body,required String path}){
+    print('path: $path');
+    // AwesomeNotifications().cancel(10);
     AwesomeNotifications().createNotification(
         content: NotificationContent(
             id: 10,
@@ -70,9 +90,39 @@ class PlayerController extends GetxController{
             title: title,
             body: body,
             actionType: ActionType.KeepOnTop,
-          category: NotificationCategory.Status,
-          locked: true
-        )
+          // largeIcon: ,
+          summary: isPlaying ? 'Now playing' : '',
+            bigPicture: 'file://$path',
+            largeIcon: 'file://$path',
+          color: Colors.purple.shade700,
+          category: NotificationCategory.Transport,
+          notificationLayout: NotificationLayout.MediaPlayer,
+          progress: 50,
+          locked: true,
+          showWhen: false,
+          autoDismissible: false,
+        ),
+        actionButtons: [
+          NotificationActionButton(
+            key: "previous",
+            label: "Previous",
+            icon: 'resource://drawable/previous',
+            color: Colors.white
+          ),
+          NotificationActionButton(
+            key: "play",
+            label: "Play",
+            icon: 'resource://drawable/play',
+            color: Colors.white
+          ),
+          NotificationActionButton(
+            key: "next",
+            label: "Next",
+            icon: 'resource://drawable/next',
+            color: Colors.white
+          )
+        ]
+    // );
     );
   }
 
