@@ -1,6 +1,7 @@
 import 'dart:isolate';
 import 'dart:ui';
 
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
@@ -47,14 +48,35 @@ class PlayerController extends GetxController{
         // print('====================================================== $list');
       }
       player.setAudioSource(playlist,initialIndex: index);
+      String title = player.sequence![index].tag.title;
+      String artist = player.sequence![index].tag.artist;
+      createNotification(title: title, body: artist);
       player.play();
       player.currentIndexStream.listen((event) {
         setCurrentIndex(player.currentIndex ?? 0);
+        String title = player.sequence![player.currentIndex ?? 0].tag.title;
+        String artist = player.sequence![player.currentIndex ?? 0].tag.artist;
+        createNotification(title: title, body: artist);
       });
+
     }
   }
 
+  createNotification({required String title, required String body}){
+    AwesomeNotifications().createNotification(
+        content: NotificationContent(
+            id: 10,
+            channelKey: 'play_channel',
+            title: title,
+            body: body,
+            actionType: ActionType.KeepOnTop,
+          category: NotificationCategory.Status,
+          locked: true
+        )
+    );
+  }
 
+  getLyrics(){}
 
   initialPlay({required String path}) async{
     if(isPlaying){

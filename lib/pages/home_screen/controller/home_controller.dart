@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:get/get.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
@@ -19,6 +20,14 @@ class HomeController extends GetxController{
       if(status){
         getLists();
       }
+      AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+        if (!isAllowed) {
+          // This is just a basic example. For real apps, you must show some
+          // friendly dialog box before call the request method.
+          // This is very important to not harm the user experience
+          AwesomeNotifications().requestPermissionToSendNotifications();
+        }
+      });
     }
     else{
       getLists();

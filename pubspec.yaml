@@ -39,6 +39,8 @@ dependencies:
   on_audio_query: ^2.9.0
   responsive_sizer: ^3.2.0
   just_audio: ^0.9.34
+  awesome_notifications: ^0.7.4+1
+  http: 0.13.6
 
 dev_dependencies:
   flutter_test:

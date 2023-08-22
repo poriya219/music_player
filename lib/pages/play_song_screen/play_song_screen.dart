@@ -16,7 +16,6 @@ class PlaySongScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kBackBlackColor,
       body: GetBuilder<PlayerController>(builder: (pController) {
         return StreamBuilder(stream: controller.player.currentIndexStream, builder: (context,AsyncSnapshot iSnapshot){
           if(iSnapshot.hasData){
@@ -71,7 +70,7 @@ class PlaySongScreen extends StatelessWidget {
                                         child: Center(
                                           child: Icon(
                                             Icons.arrow_back_ios_new_outlined,
-                                            color: Colors.white,
+                                            color: Theme.of(context).primaryColorLight,
                                             size: 7.w,
                                           ),
                                         ),
@@ -108,7 +107,7 @@ class PlaySongScreen extends StatelessWidget {
                                       radius: 6.w,
                                       child: Icon(
                                         Icons.more_horiz,
-                                        color: Colors.white,
+                                        color: Theme.of(context).primaryColorLight,
                                         size: 7.w,
                                       ),
                                     )
@@ -136,7 +135,7 @@ class PlaySongScreen extends StatelessWidget {
                                           child: Icon(
                                             Icons.shuffle,
                                             size: 10.w,
-                                            color: isShuffle ? kBlueColor : Colors.white,
+                                            color: isShuffle ? kBlueColor : Get.theme.primaryColor,
                                           ),
                                         );
                                       }
@@ -148,7 +147,7 @@ class PlaySongScreen extends StatelessWidget {
                                           child: Icon(
                                             Icons.shuffle,
                                             size: 10.w,
-                                            color: Colors.white,
+                                            color: Get.theme.primaryColor,
                                           ),
                                         );
                                       }
@@ -160,7 +159,7 @@ class PlaySongScreen extends StatelessWidget {
                                       child: Icon(
                                         Icons.skip_previous,
                                         size: 10.w,
-                                        color: Colors.white,
+                                        color: Get.theme.primaryColor,
                                       ),
                                     ),
                                     GestureDetector(
@@ -197,14 +196,41 @@ class PlaySongScreen extends StatelessWidget {
                                       child: Icon(
                                         Icons.skip_next,
                                         size: 10.w,
-                                        color: Colors.white,
+                                        color: Get.theme.primaryColor,
                                       ),
                                     ),
-                                    Icon(
-                                      Icons.repeat_one,
-                                      size: 10.w,
-                                      color: kBlueColor,
-                                    ),
+                                    StreamBuilder(stream: controller.player.loopModeStream, builder: (context, AsyncSnapshot loopSnapshot){
+                                      if(loopSnapshot.hasData){
+                                        LoopMode loopMode = loopSnapshot.data;
+                                        return GestureDetector(
+                                          onTap: (){
+                                            if( loopMode == LoopMode.off){
+                                              controller.player.setLoopMode(LoopMode.all);
+                                            }
+                                            else if( loopMode == LoopMode.all){
+                                              controller.player.setLoopMode(LoopMode.one);
+                                            }
+                                            else{
+                                              controller.player.setLoopMode(LoopMode.off);
+                                            }
+                                          },
+                                          child: Icon(
+                                            loopMode == LoopMode.one ? Icons.repeat_one : Icons.repeat,
+                                            size: 10.w,
+                                            color: loopMode == LoopMode.off ? Get.theme.primaryColor : kBlueColor,
+                                          ),
+                                        );
+                                      }
+                                      else{
+                                        return GestureDetector(
+                                          child: Icon(
+                                            Icons.repeat_one,
+                                            size: 10.w,
+                                            color: Get.theme.primaryColor,
+                                          ),
+                                        );
+                                      }
+                                    })
                                   ],
                                 ),
                               ),
@@ -224,17 +250,43 @@ class PlaySongScreen extends StatelessWidget {
                                                 (context, AsyncSnapshot pSnapshot) {
                                               if (pSnapshot.hasData) {
                                                 Duration position = pSnapshot.data;
-                                                return Slider(
-                                                  thumbColor: kBlueColor,
-                                                  activeColor: kBlueColor,
-                                                  inactiveColor: kTextGreyColor,
-                                                  value:
-                                                  position.inSeconds.toDouble(),
-                                                  onChanged: (value) {
-                                                    controller.player.seek(Duration(seconds: value.toInt()));
-                                                  },
-                                                  max:
-                                                  duration.inSeconds.toDouble(),
+                                                return Column(
+                                                  children: [
+                                                    Slider(
+                                                      thumbColor: kBlueColor,
+                                                      activeColor: kBlueColor,
+                                                      inactiveColor: kTextGreyColor,
+                                                      value:
+                                                      position.inSeconds.toDouble(),
+                                                      onChanged: (value) {
+                                                        controller.player.seek(Duration(seconds: value.toInt()));
+                                                      },
+                                                      max:
+                                                      duration.inSeconds.toDouble(),
+                                                    ),
+                                                    Padding(
+                                                      padding: EdgeInsets.symmetric(horizontal: 7.w),
+                                                      child: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        children: [
+                                                          Text('${position.inMinutes < 10 ? '0${position.inMinutes}' : position.inMinutes}:${position.inSeconds % 60 < 10 ? '0${position.inSeconds % 60}' : position.inSeconds % 60}',
+                                                          style: TextStyle(
+                                                            color: Get.theme.primaryColor,
+                                                            fontSize: 14.sp,
+                                                            fontWeight: FontWeight.w500
+                                                          ),
+                                                          ),
+                                                          Text('${duration.inMinutes < 10 ? '0${duration.inMinutes}' : duration.inMinutes}:${duration.inSeconds % 60 < 10 ? '0${duration.inSeconds % 60}' : duration.inSeconds % 60}',
+                                                            style: TextStyle(
+                                                                color: Get.theme.primaryColor,
+                                                                fontSize: 14.sp,
+                                                                fontWeight: FontWeight.w500
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
                                                 );
                                               } else {
                                                 return const SizedBox();

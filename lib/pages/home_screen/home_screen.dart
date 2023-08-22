@@ -22,26 +22,49 @@ class HomeScreen extends StatelessWidget {
   final playerController = Get.put(PlayerController());
   final appController = Get.put(AppController());
 
+  final GlobalKey<ScaffoldState> _key = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kBackBlackColor,
+      key: _key,
+      drawer: Drawer(
+        child: Column(
+          children: [
+            SizedBox(
+              width: 50.w,
+              height: 10.h,
+              child: ListView.builder(
+                  itemCount: 3,
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context,index){
+                    return GestureDetector(
+                        onTap: (){
+                          Get.changeThemeMode(index == 0 ? ThemeMode.light : ThemeMode.dark);
+                        },
+                        child: CircleAvatar());
+                  }),
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
-        backgroundColor: kBackBlackColor,
-        surfaceTintColor: kBackBlackColor,
         actions: [
           IconButton(
               onPressed: () {},
-              icon: const Icon(
+              icon: Icon(
                 Icons.search,
-                color: Colors.white,
+                color: Theme.of(context).iconTheme.color,
               ))
         ],
         leading: IconButton(
-            onPressed: () {},
-            icon: const Icon(
+            onPressed: () {
+              _key.currentState!.openDrawer();
+            },
+            icon: Icon(
               Icons.menu,
-              color: Colors.white,
+              color: Theme.of(context).iconTheme.color,
             )),
       ),
       body: SafeArea(
@@ -61,9 +84,13 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: controller.selectedFilter == 'Song'
-                    ? SongsList(songs: controller.songs)
-                    : SizedBox(),
+                child: Stack(
+                  children: [
+                    controller.selectedFilter == 'Song'
+                        ? SongsList(songs: controller.songs)
+                        : SizedBox()
+                  ],
+                ),
               ),
               StreamBuilder(stream: playerController.player.playingStream, builder: (context, AsyncSnapshot pSnapshot){
                 if(pSnapshot.hasData){
@@ -82,14 +109,12 @@ class HomeScreen extends StatelessWidget {
                             onTap: (){
                               Get.to(()=> PlaySongScreen());
                             },
-                            child: Container(
-                              color: kBackBlackColor.withOpacity(1.0),
+                            child: SizedBox(
                               height: 9.h,
                               child: Stack(
                                 alignment: Alignment.bottomCenter,
                                 children: [
                                   Container(
-                                    color: kBackBlackColor,
                                     width: 100.w,
                                     height: 7.h,
                                     child: Row(
@@ -108,7 +133,6 @@ class HomeScreen extends StatelessWidget {
                                               style: TextStyle(
                                                 fontSize: 16.sp,
                                                 fontWeight: FontWeight.bold,
-                                                color: Colors.white,
                                               ),
                                             ),
                                             Text(songArtist,
@@ -133,7 +157,7 @@ class HomeScreen extends StatelessWidget {
                                               playerController.player.play();
                                             }
                                           },
-                                          child: Icon(isPlaying ? Icons.pause : Icons.play_arrow,color: Colors.white,size: 8.w,),
+                                          child: Icon(isPlaying ? Icons.pause : Icons.play_arrow,color: Theme.of(context).iconTheme.color,size: 8.w,),
                                         ),
                                         SizedBox(
                                           width: 7.w,
@@ -142,7 +166,7 @@ class HomeScreen extends StatelessWidget {
                                           onTap: (){
                                             playerController.player.seekToNext();
                                           },
-                                          child: Icon(Icons.skip_next,color: kGreyColor,size: 7.w,),
+                                          child: Icon(Icons.skip_next,color: kTextGreyColor,size: 7.w,),
                                         ),
                                         SizedBox(
                                           width: 5.w,
@@ -152,7 +176,7 @@ class HomeScreen extends StatelessWidget {
                                   ),
                                   Positioned(
                                       left: 4.w,
-                                      bottom: 1.h,
+                                      bottom: 2.h,
                                       child: FutureBuilder(future: appController.getSongImage(artwork.id), builder: (context, AsyncSnapshot fSnapshot){
                                         if(fSnapshot.hasData && fSnapshot.connectionState == ConnectionState.done){
                                           Uint8List data = fSnapshot.data;
@@ -202,13 +226,13 @@ class HomeScreen extends StatelessWidget {
           margin: EdgeInsets.symmetric(horizontal: 2.w, vertical: 1.h),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
-            color: controller.selectedFilter == title ? kBlueColor : kGreyColor,
+            color: controller.selectedFilter == title ? kBlueColor : Get.theme.primaryColor,
           ),
           child: Center(
             child: Text(
               title,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: kSecondColor,
               ),
             ),
           ),

@@ -87,7 +87,7 @@ class SongsList extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: Text(song.title,overflow: TextOverflow.ellipsis,style: const TextStyle(color: Colors.white),)),
+                  Expanded(child: Text(song.title,overflow: TextOverflow.ellipsis,)),
                   Expanded(child: Text(song.artist ?? '<unknown>',overflow: TextOverflow.ellipsis,style: TextStyle(color: kTextGreyColor),)),
                 ],
               ),
