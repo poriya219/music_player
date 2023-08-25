@@ -42,6 +42,10 @@ dependencies:
   awesome_notifications: ^0.7.4+1
   http: ^1.1.0
   path_provider: ^2.1.0
+  animated_toggle_switch: ^0.7.0
+  package_info_plus: ^4.1.0
+  shared_preferences: ^2.2.0
+  eva_icons_flutter: ^3.1.0
 
 dev_dependencies:
   flutter_test:

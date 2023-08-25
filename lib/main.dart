@@ -22,6 +22,8 @@ void main() {
             channelDescription: 'Notification channel for Play Music',
             defaultColor: Color(0xFF9D50DD),
             playSound: false,
+            enableVibration: false,
+            enableLights: false,
             importance: NotificationImportance.High,
             ledColor: Colors.white)
       ],

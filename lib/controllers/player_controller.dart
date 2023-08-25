@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
@@ -8,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:music_player/constans.dart';
 import 'package:music_player/controllers/app_controller.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:path_provider/path_provider.dart';
@@ -55,32 +55,59 @@ class PlayerController extends GetxController{
       }
       player.setAudioSource(playlist,initialIndex: index);
       player.play();
-      player.currentIndexStream.listen((event) async{
+      StreamSubscription? stream1;
+      StreamSubscription? stream2;
+      StreamSubscription? stream3;
+      StreamSubscription? stream4;
+      if(stream1 != null){
+        await stream1.cancel();
+      }
+      stream1 = player.currentIndexStream.listen((event) async{
+        print('stream 1');
         setCurrentIndex(player.currentIndex ?? 0);
         String title = player.sequence![player.currentIndex ?? 0].tag.title;
         String artist = player.sequence![player.currentIndex ?? 0].tag.artist;
         QueryArtworkWidget artwork = player.sequence![player.currentIndex ?? 0].tag.artwork;
         final appController = Get.find<AppController>();
-        print('before listdata:');
         Uint8List? listData = await appController.getSongImage(artwork.id);
-        print('listdata: $listData');
         final Directory tempDir = await getTemporaryDirectory();
         File file = await File('${tempDir.path}/${artwork.id}.png').create();
         if(listData != null){
           await file.writeAsBytes(listData);
         }
         else{
-          print('null listdata:');
           final ByteData bytes = await rootBundle.load('assets/images/gd.png');
           final Uint8List listBytes = bytes.buffer.asUint8List();
           await file.writeAsBytes(listBytes);
         }
-        createNotification(title: title, body: artist,path: file.path);
+        if(stream2 != null){
+          await stream2!.cancel();
+        }
+        stream2 = player.playingStream.listen((plEvent) async{
+          print('stream 2');
+          bool isPlaying = plEvent;
+          if(stream3 != null){
+            await stream3!.cancel();
+          }
+          stream3 = player.durationStream.listen((dEvent) async{
+            print('stream 3');
+            Duration duration = dEvent ?? const Duration(seconds: 1);
+            if(stream4 != null){
+              await stream4!.cancel();
+            }
+            stream4 = player.positionStream.listen((poEvent) async{
+              print('stream 4');
+              Duration position = poEvent;
+              print('current progress: ${((position.inSeconds / duration.inSeconds) * 100).toInt()}');
+              createNotification(title: title, body: artist,path: file.path,isPlaying: isPlaying,progress: ((position.inSeconds / duration.inSeconds) * 100).toInt());
+            });
+          });
+        });
       });
     }
   }
 
-  createNotification({required String title, required String body,required String path}){
+  createNotification({required String title, required String body,required String path,required bool isPlaying, required int progress}){
     print('path: $path');
     // AwesomeNotifications().cancel(10);
     AwesomeNotifications().createNotification(
@@ -97,29 +124,32 @@ class PlayerController extends GetxController{
           color: Colors.purple.shade700,
           category: NotificationCategory.Transport,
           notificationLayout: NotificationLayout.MediaPlayer,
-          progress: 50,
+          progress: progress,
           locked: true,
           showWhen: false,
-          autoDismissible: false,
+
+          autoDismissible: false
         ),
         actionButtons: [
           NotificationActionButton(
             key: "previous",
             label: "Previous",
-            icon: 'resource://drawable/previous',
-            color: Colors.white
+            icon: 'resource://drawable/pre',
+            autoDismissible: false,
           ),
           NotificationActionButton(
             key: "play",
             label: "Play",
-            icon: 'resource://drawable/play',
-            color: Colors.white
+            icon: isPlaying ? 'resource://drawable/pa' : 'resource://drawable/p',
+            color: Colors.white,
+            autoDismissible: false,
           ),
           NotificationActionButton(
             key: "next",
             label: "Next",
-            icon: 'resource://drawable/next',
-            color: Colors.white
+            icon: 'resource://drawable/n',
+            color: Colors.white,
+            autoDismissible: false,
           )
         ]
     // );

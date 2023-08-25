@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
@@ -69,7 +70,7 @@ class PlaySongScreen extends StatelessWidget {
                                         radius: 6.w,
                                         child: Center(
                                           child: Icon(
-                                            Icons.arrow_back_ios_new_outlined,
+                                            EvaIcons.arrowIosBack,
                                             color: Theme.of(context).primaryColorLight,
                                             size: 7.w,
                                           ),
@@ -106,7 +107,7 @@ class PlaySongScreen extends StatelessWidget {
                                       backgroundColor: Colors.black.withOpacity(0.3),
                                       radius: 6.w,
                                       child: Icon(
-                                        Icons.more_horiz,
+                                        EvaIcons.moreHorizontal,
                                         color: Theme.of(context).primaryColorLight,
                                         size: 7.w,
                                       ),
@@ -133,7 +134,7 @@ class PlaySongScreen extends StatelessWidget {
                                             }
                                           },
                                           child: Icon(
-                                            Icons.shuffle,
+                                            EvaIcons.shuffle2,
                                             size: 10.w,
                                             color: isShuffle ? kBlueColor : Get.theme.primaryColor,
                                           ),
@@ -145,7 +146,7 @@ class PlaySongScreen extends StatelessWidget {
                                             controller.player.setShuffleModeEnabled(true);
                                           },
                                           child: Icon(
-                                            Icons.shuffle,
+                                            EvaIcons.shuffle2,
                                             size: 10.w,
                                             color: Get.theme.primaryColor,
                                           ),
@@ -157,7 +158,7 @@ class PlaySongScreen extends StatelessWidget {
                                         controller.player.seekToPrevious();
                                       },
                                       child: Icon(
-                                        Icons.skip_previous,
+                                        EvaIcons.skipBack,
                                         size: 10.w,
                                         color: Get.theme.primaryColor,
                                       ),
@@ -194,7 +195,7 @@ class PlaySongScreen extends StatelessWidget {
                                         controller.player.seekToNext();
                                       },
                                       child: Icon(
-                                        Icons.skip_next,
+                                        EvaIcons.skipForward,
                                         size: 10.w,
                                         color: Get.theme.primaryColor,
                                       ),
@@ -214,8 +215,24 @@ class PlaySongScreen extends StatelessWidget {
                                               controller.player.setLoopMode(LoopMode.off);
                                             }
                                           },
-                                          child: Icon(
-                                            loopMode == LoopMode.one ? Icons.repeat_one : Icons.repeat,
+                                          child: loopMode == LoopMode.one ? Stack(
+                                            alignment: Alignment.topRight,
+                                            children: [
+                                              Icon(
+                                                EvaIcons.repeat,
+                                                size: 10.w,
+                                                color: loopMode == LoopMode.off ? Get.theme.primaryColor : kBlueColor,
+                                              ),
+                                              CircleAvatar(
+                                                radius: 2.w,
+                                                backgroundColor: kBlueColor,
+                                                child: Center(
+                                                  child: Text('1',style: TextStyle(color: Colors.white,fontSize: 12.sp),),
+                                                ),
+                                              ),
+                                            ],
+                                          ) : Icon(
+                                            loopMode == LoopMode.one ? EvaIcons.repeat : EvaIcons.repeat,
                                             size: 10.w,
                                             color: loopMode == LoopMode.off ? Get.theme.primaryColor : kBlueColor,
                                           ),
@@ -224,7 +241,7 @@ class PlaySongScreen extends StatelessWidget {
                                       else{
                                         return GestureDetector(
                                           child: Icon(
-                                            Icons.repeat_one,
+                                            EvaIcons.repeat,
                                             size: 10.w,
                                             color: Get.theme.primaryColor,
                                           ),

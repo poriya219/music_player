@@ -38,6 +38,7 @@ class SongsList extends StatelessWidget {
       child: Container(
         width: 90.w,
         height: 7.h,
+        color: Colors.transparent,
         margin: EdgeInsets.symmetric(vertical: 1.h,horizontal: 5.w),
         child: Row(
           children: [
