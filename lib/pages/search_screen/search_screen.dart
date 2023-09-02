@@ -112,7 +112,7 @@ class SearchScreen extends StatelessWidget {
                       scrollDirection: Axis.horizontal,
                       shrinkWrap: true,
                       itemBuilder: (context,index){
-                        return historyContainer(title: searchController.history[index]);
+                        return historyContainer(title: searchController.history.reversed.toList()[index]);
                       })),
                 ),
                 Visibility(

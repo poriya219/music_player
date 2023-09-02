@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:music_player/constans.dart';
+import 'package:music_player/controllers/lyrics_controller.dart';
 import 'package:music_player/controllers/player_controller.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -13,6 +14,7 @@ class PlaySongScreen extends StatelessWidget {
   PlaySongScreen({super.key});
 
   final controller = Get.put(PlayerController());
+  final lyricsController = Get.put(LyricsController());
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +33,7 @@ class PlaySongScreen extends StatelessWidget {
                         list[cIndex].tag.artwork;
                     String songTitle = list[cIndex].tag.title;
                     String songArtist = list[cIndex].tag.artist;
+                    lyricsController.getLyrics(title: songTitle, artist: songArtist);
                     return Stack(
                       children: [
                         SizedBox(
@@ -116,6 +119,51 @@ class PlaySongScreen extends StatelessWidget {
                                 ),
                               ),
                               const Spacer(),
+                              GetBuilder<LyricsController>(builder: (lController){
+                                return SizedBox(
+                                  width: 80.w,
+                                  height: 30.h,
+                                  child: ShaderMask(
+                                    shaderCallback: (rect) {
+                                      return const LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [Colors.black, Colors.transparent],
+                                      ).createShader(
+                                          Rect.fromLTRB(0, 0, rect.width, rect.height));
+                                    },
+                                    blendMode: BlendMode.dstIn,
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        children: [
+                                          ListView.builder(
+                                              itemCount: lyricsController.lyricsString == null ? 0 : lyricsController.lyricsString!.split('\n').length,
+                                              physics: const NeverScrollableScrollPhysics(),
+                                              shrinkWrap: true,
+                                              itemBuilder: (context,index){
+                                                List<String> stList = lyricsController.lyricsString!.split('\n');
+                                                return Padding(
+                                                  padding: EdgeInsets.symmetric(vertical: 1.h),
+                                                  child: Text(stList[index],
+                                                  textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 18.sp,
+                                                      fontWeight: FontWeight.w500
+                                                    ),
+                                                  ),
+                                                );
+
+                                              }),
+                                          SizedBox(
+                                            height: 7.h,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
                               Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 5.w),
                                 child: Row(
