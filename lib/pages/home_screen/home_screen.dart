@@ -14,6 +14,7 @@ import 'package:music_player/pages/home_screen/widgets/songs_list.dart';
 import 'package:music_player/pages/search_screen/search_screen.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../play_song_screen/play_song_screen.dart';
 import 'controller/home_controller.dart';
@@ -50,11 +51,13 @@ class HomeScreen extends StatelessWidget {
                       AnimatedToggleSwitch<int>.rolling(
                         current: appController.themeValue,
                         values: const [0, 1],
-                        onChanged: (value) {
+                        onChanged: (value) async{
+                          final prefs = await SharedPreferences.getInstance();
                           appController.setThemeValue(value);
                           Timer(const Duration(milliseconds: 500), () {
                             Get.changeThemeMode(
                                 value == 0 ? ThemeMode.light : ThemeMode.dark);
+                            prefs.setBool('isDark', value == 0 ? false : true);
                           });
                         },
                         iconBuilder: (int value,size,boolVale){

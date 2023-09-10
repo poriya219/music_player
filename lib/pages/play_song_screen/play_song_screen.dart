@@ -141,7 +141,7 @@ class PlaySongScreen extends StatelessWidget {
                                               physics: const NeverScrollableScrollPhysics(),
                                               shrinkWrap: true,
                                               itemBuilder: (context,index){
-                                                List<String> stList = lyricsController.lyricsString!.split('\n');
+                                                List<String> stList = lyricsController.lyricsString == null ? <String>[] : lyricsController.lyricsString!.split('\n');
                                                 return Padding(
                                                   padding: EdgeInsets.symmetric(vertical: 1.h),
                                                   child: Text(stList[index],

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
@@ -12,8 +13,34 @@ import 'package:just_audio/just_audio.dart';
 import 'package:music_player/controllers/app_controller.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PlayerController extends GetxController{
+
+  @override
+  void onInit() {
+    songListeningStream();
+    super.onInit();
+  }
+
+  songListeningStream(){
+    player.currentIndexStream.listen((event) async{
+      if(event != null){
+        Timer(const Duration(seconds: 1), () async{
+          print('add');
+          int id = playlist[event];
+          final prefs = await SharedPreferences.getInstance();
+          String playCountsString = prefs.getString('playCount') ?? jsonEncode({});
+          Map map = jsonDecode(playCountsString);
+          map.putIfAbsent(id.toString(), () => 0);
+          int count = map[id.toString()] ?? 0;
+          map[id.toString()] = count + 1;
+          print('map: $map');
+          prefs.setString('playCount', jsonEncode(map));
+        });
+      }
+    });
+  }
 
   bool isPlaying = false;
   setIsPlaying(bool value){
@@ -155,8 +182,6 @@ class PlayerController extends GetxController{
     // );
     );
   }
-
-  getLyrics(){}
 
   initialPlay({required String path}) async{
     if(isPlaying){
