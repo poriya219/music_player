@@ -102,6 +102,7 @@ class PlayerController extends GetxController{
         if(listData != null){
           await file.writeAsBytes(listData);
         }
+
         else{
           final ByteData bytes = await rootBundle.load('assets/images/gd.png');
           final Uint8List listBytes = bytes.buffer.asUint8List();
