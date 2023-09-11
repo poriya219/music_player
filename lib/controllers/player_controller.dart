@@ -15,6 +15,8 @@ import 'package:on_audio_query/on_audio_query.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../pages/home_screen/controller/home_controller.dart';
+
 class PlayerController extends GetxController{
 
   @override
@@ -28,7 +30,16 @@ class PlayerController extends GetxController{
       if(event != null){
         Timer(const Duration(seconds: 1), () async{
           print('add');
-          int id = playlist[event];
+          List<IndexedAudioSource> list = player.sequence ?? <IndexedAudioSource>[];
+          String songTitle = list[event].tag.title;
+          int? id;
+          final homeController = Get.find<HomeController>();
+          for(var each in homeController.songs){
+            if(each.title == songTitle){
+              id = each.id;
+              break;
+            }
+          }
           final prefs = await SharedPreferences.getInstance();
           String playCountsString = prefs.getString('playCount') ?? jsonEncode({});
           Map map = jsonDecode(playCountsString);
@@ -50,7 +61,11 @@ class PlayerController extends GetxController{
 
   final player = AudioPlayer();
 
-  final playlist = ConcatenatingAudioSource(children: []);
+  ConcatenatingAudioSource playlist = ConcatenatingAudioSource(children: []);
+  resetPlayList(){
+    playlist = ConcatenatingAudioSource(children: []);
+    update();
+  }
 
   int currentIndex = 0;
   setCurrentIndex(int value){
@@ -60,6 +75,7 @@ class PlayerController extends GetxController{
 
   sourceListGetter({required List<SongModel> list,required int index}) async{
     if(list.isNotEmpty){
+      resetPlayList();
       setCurrentIndex(index);
       for(var each in list){
         playlist.add(AudioSource.uri(Uri.file(each.data),
@@ -102,7 +118,6 @@ class PlayerController extends GetxController{
         if(listData != null){
           await file.writeAsBytes(listData);
         }
-
         else{
           final ByteData bytes = await rootBundle.load('assets/images/gd.png');
           final Uint8List listBytes = bytes.buffer.asUint8List();
@@ -155,7 +170,6 @@ class PlayerController extends GetxController{
           progress: progress,
           locked: true,
           showWhen: false,
-
           autoDismissible: false
         ),
         actionButtons: [
@@ -178,8 +192,8 @@ class PlayerController extends GetxController{
             icon: 'resource://drawable/n',
             color: Colors.white,
             autoDismissible: false,
-          )
-        ]
+          ),
+        ],
     // );
     );
   }

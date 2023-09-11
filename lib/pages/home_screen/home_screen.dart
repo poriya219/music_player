@@ -172,7 +172,8 @@ class HomeScreen extends StatelessWidget {
                                         onTap: () {
                                           Get.to(() => PlaySongScreen());
                                         },
-                                        child: SizedBox(
+                                        child: Container(
+                                          color: Colors.transparent,
                                           height: 9.h,
                                           child: Stack(
                                             alignment: Alignment.bottomCenter,

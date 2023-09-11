@@ -152,6 +152,7 @@ class SongsList extends StatelessWidget {
       onTap: (){
         final playerController = Get.put(PlayerController());
           // playerController.initialPlay(path: song.data);
+        print('index: $index');
         Get.to(()=> PlaySongScreen());
         playerController.sourceListGetter(list: songsList,index: index);
       },

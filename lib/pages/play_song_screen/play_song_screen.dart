@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -9,12 +10,15 @@ import 'package:music_player/controllers/lyrics_controller.dart';
 import 'package:music_player/controllers/player_controller.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../home_screen/controller/home_controller.dart';
 
 class PlaySongScreen extends StatelessWidget {
   PlaySongScreen({super.key});
 
   final controller = Get.put(PlayerController());
-  final lyricsController = Get.put(LyricsController());
+
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +26,7 @@ class PlaySongScreen extends StatelessWidget {
       body: GetBuilder<PlayerController>(builder: (pController) {
         return StreamBuilder(stream: controller.player.currentIndexStream, builder: (context,AsyncSnapshot iSnapshot){
           if(iSnapshot.hasData){
+            final lyricsController = Get.put(LyricsController());
             int cIndex = iSnapshot.data ?? 0;
             AudioSource cSong = controller.playlist[cIndex];
             return StreamBuilder(
@@ -147,7 +152,7 @@ class PlaySongScreen extends StatelessWidget {
                                                   child: Text(stList[index],
                                                   textAlign: TextAlign.center,
                                                     style: TextStyle(
-                                                      color: Colors.white,
+                                                      color: Theme.of(context).iconTheme.color,
                                                       fontSize: 18.sp,
                                                       fontWeight: FontWeight.w500
                                                     ),
@@ -166,136 +171,165 @@ class PlaySongScreen extends StatelessWidget {
                               }),
                               Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 5.w),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                child: Column(
                                   children: [
-                                    StreamBuilder(stream: controller.player.shuffleModeEnabledStream, builder: (context, AsyncSnapshot shuffleSnapshot){
-                                      if(shuffleSnapshot.hasData){
-                                        bool isShuffle = shuffleSnapshot.data ?? false;
-                                        return GestureDetector(
-                                          onTap: (){
-                                            if(isShuffle){
-                                              controller.player.setShuffleModeEnabled(false);
-                                            }
-                                            else{
-                                              controller.player.setShuffleModeEnabled(true);
-                                            }
-                                          },
-                                          child: Icon(
-                                            EvaIcons.shuffle2,
-                                            size: 10.w,
-                                            color: isShuffle ? kBlueColor : Get.theme.primaryColor,
+                                    Row(
+                                      children: [
+                                        FutureBuilder(future: getCount(songTitle), builder: (context, AsyncSnapshot snapshot){
+                                          int pCount = snapshot.data ?? 0;
+                                          return Text(pCount.toString(),
+                                          style: TextStyle(
+                                            fontSize: 17.sp,
                                           ),
-                                        );
-                                      }
-                                      else{
-                                        return GestureDetector(
-                                          onTap: (){
-                                            controller.player.setShuffleModeEnabled(true);
-                                          },
-                                          child: Icon(
-                                            EvaIcons.shuffle2,
-                                            size: 10.w,
-                                            color: Get.theme.primaryColor,
-                                          ),
-                                        );
-                                      }
-                                    }),
-                                    GestureDetector(
-                                      onTap: (){
-                                        controller.player.seekToPrevious();
-                                      },
-                                      child: Icon(
-                                        EvaIcons.skipBack,
-                                        size: 10.w,
-                                        color: Get.theme.primaryColor,
-                                      ),
+                                          );
+                                        }),
+                                        SizedBox(
+                                          width: 1.w,
+                                        ),
+                                        Icon(EvaIcons.playCircleOutline,size: 6.w,),
+                                        const Spacer(),
+                                        GestureDetector(
+                                            onTap: (){
+                                              kShowToast('ASAP');
+                                            },
+                                            child: Icon(EvaIcons.heart,size: 6.w,color: Colors.redAccent,)),
+                                      ],
                                     ),
-                                    GestureDetector(
-                                      onTap: (){
-                                        if(controller.player.playing){
-                                          controller.player.pause();
-                                        }
-                                        else{
-                                          controller.player.play();
-                                        }
-                                      },
-                                      child: CircleAvatar(
-                                        radius: 8.w,
-                                        backgroundColor: kBlueColor,
-                                        child: StreamBuilder(stream: controller.player.playingStream, builder: (context,AsyncSnapshot pSnapshot){
-                                          if(pSnapshot.hasData){
-                                            bool isPlaying = pSnapshot.data;
-                                            return Icon(
-                                              isPlaying ? Icons.pause : Icons.play_arrow,
-                                              size: 10.w,
-                                              color: Colors.white,
+                                    SizedBox(
+                                      height: 1.h,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        StreamBuilder(stream: controller.player.shuffleModeEnabledStream, builder: (context, AsyncSnapshot shuffleSnapshot){
+                                          if(shuffleSnapshot.hasData){
+                                            bool isShuffle = shuffleSnapshot.data ?? false;
+                                            return GestureDetector(
+                                              onTap: (){
+                                                if(isShuffle){
+                                                  controller.player.setShuffleModeEnabled(false);
+                                                }
+                                                else{
+                                                  controller.player.setShuffleModeEnabled(true);
+                                                }
+                                              },
+                                              child: Icon(
+                                                EvaIcons.shuffle2,
+                                                size: 10.w,
+                                                color: isShuffle ? kBlueColor : Get.theme.primaryColor,
+                                              ),
                                             );
                                           }
                                           else{
-                                            return const SizedBox();
+                                            return GestureDetector(
+                                              onTap: (){
+                                                controller.player.setShuffleModeEnabled(true);
+                                              },
+                                              child: Icon(
+                                                EvaIcons.shuffle2,
+                                                size: 10.w,
+                                                color: Get.theme.primaryColor,
+                                              ),
+                                            );
                                           }
                                         }),
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: (){
-                                        controller.player.seekToNext();
-                                      },
-                                      child: Icon(
-                                        EvaIcons.skipForward,
-                                        size: 10.w,
-                                        color: Get.theme.primaryColor,
-                                      ),
-                                    ),
-                                    StreamBuilder(stream: controller.player.loopModeStream, builder: (context, AsyncSnapshot loopSnapshot){
-                                      if(loopSnapshot.hasData){
-                                        LoopMode loopMode = loopSnapshot.data;
-                                        return GestureDetector(
+                                        GestureDetector(
                                           onTap: (){
-                                            if( loopMode == LoopMode.off){
-                                              controller.player.setLoopMode(LoopMode.all);
-                                            }
-                                            else if( loopMode == LoopMode.all){
-                                              controller.player.setLoopMode(LoopMode.one);
-                                            }
-                                            else{
-                                              controller.player.setLoopMode(LoopMode.off);
-                                            }
+                                            controller.player.seekToPrevious();
                                           },
-                                          child: loopMode == LoopMode.one ? Stack(
-                                            alignment: Alignment.topRight,
-                                            children: [
-                                              Icon(
-                                                EvaIcons.repeat,
-                                                size: 10.w,
-                                                color: loopMode == LoopMode.off ? Get.theme.primaryColor : kBlueColor,
-                                              ),
-                                              CircleAvatar(
-                                                radius: 2.w,
-                                                backgroundColor: kBlueColor,
-                                                child: Center(
-                                                  child: Text('1',style: TextStyle(color: Colors.white,fontSize: 12.sp),),
-                                                ),
-                                              ),
-                                            ],
-                                          ) : Icon(
-                                            loopMode == LoopMode.one ? EvaIcons.repeat : EvaIcons.repeat,
-                                            size: 10.w,
-                                            color: loopMode == LoopMode.off ? Get.theme.primaryColor : kBlueColor,
-                                          ),
-                                        );
-                                      }
-                                      else{
-                                        return GestureDetector(
                                           child: Icon(
-                                            EvaIcons.repeat,
+                                            EvaIcons.skipBack,
                                             size: 10.w,
                                             color: Get.theme.primaryColor,
                                           ),
-                                        );
-                                      }
-                                    })
+                                        ),
+                                        GestureDetector(
+                                          onTap: (){
+                                            if(controller.player.playing){
+                                              controller.player.pause();
+                                            }
+                                            else{
+                                              controller.player.play();
+                                            }
+                                          },
+                                          child: CircleAvatar(
+                                            radius: 8.w,
+                                            backgroundColor: kBlueColor,
+                                            child: StreamBuilder(stream: controller.player.playingStream, builder: (context,AsyncSnapshot pSnapshot){
+                                              if(pSnapshot.hasData){
+                                                bool isPlaying = pSnapshot.data;
+                                                return Icon(
+                                                  isPlaying ? Icons.pause : Icons.play_arrow,
+                                                  size: 10.w,
+                                                  color: Colors.white,
+                                                );
+                                              }
+                                              else{
+                                                return const SizedBox();
+                                              }
+                                            }),
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: (){
+                                            controller.player.seekToNext();
+                                          },
+                                          child: Icon(
+                                            EvaIcons.skipForward,
+                                            size: 10.w,
+                                            color: Get.theme.primaryColor,
+                                          ),
+                                        ),
+                                        StreamBuilder(stream: controller.player.loopModeStream, builder: (context, AsyncSnapshot loopSnapshot){
+                                          if(loopSnapshot.hasData){
+                                            LoopMode loopMode = loopSnapshot.data;
+                                            return GestureDetector(
+                                              onTap: (){
+                                                if( loopMode == LoopMode.off){
+                                                  controller.player.setLoopMode(LoopMode.all);
+                                                }
+                                                else if( loopMode == LoopMode.all){
+                                                  controller.player.setLoopMode(LoopMode.one);
+                                                }
+                                                else{
+                                                  controller.player.setLoopMode(LoopMode.off);
+                                                }
+                                              },
+                                              child: loopMode == LoopMode.one ? Stack(
+                                                alignment: Alignment.topRight,
+                                                children: [
+                                                  Icon(
+                                                    EvaIcons.repeat,
+                                                    size: 10.w,
+                                                    color: loopMode == LoopMode.off ? Get.theme.primaryColor : kBlueColor,
+                                                  ),
+                                                  CircleAvatar(
+                                                    radius: 2.w,
+                                                    backgroundColor: kBlueColor,
+                                                    child: Center(
+                                                      child: Text('1',style: TextStyle(color: Colors.white,fontSize: 12.sp),),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ) : Icon(
+                                                loopMode == LoopMode.one ? EvaIcons.repeat : EvaIcons.repeat,
+                                                size: 10.w,
+                                                color: loopMode == LoopMode.off ? Get.theme.primaryColor : kBlueColor,
+                                              ),
+                                            );
+                                          }
+                                          else{
+                                            return GestureDetector(
+                                              child: Icon(
+                                                EvaIcons.repeat,
+                                                size: 10.w,
+                                                color: Get.theme.primaryColor,
+                                              ),
+                                            );
+                                          }
+                                        })
+                                      ],
+                                    ),
                                   ],
                                 ),
                               ),
@@ -385,5 +419,22 @@ class PlaySongScreen extends StatelessWidget {
         });
       }),
     );
+  }
+
+  getCount(String title) async{
+    int? id;
+    final homeController = Get.find<HomeController>();
+    for(var each in homeController.songs){
+      if(each.title == title){
+        id = each.id;
+        break;
+      }
+    }
+    final prefs = await SharedPreferences.getInstance();
+    String playCountsString = prefs.getString('playCount') ?? jsonEncode({});
+    Map map = jsonDecode(playCountsString);
+    map.putIfAbsent(id.toString(), () => 0);
+    int count = map[id.toString()] ?? 0;
+    return count;
   }
 }
