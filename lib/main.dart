@@ -1,14 +1,15 @@
+import 'dart:math';
+
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:music_player/constans.dart';
-import 'package:music_player/controllers/player_controller.dart';
 import 'package:music_player/pages/home_screen/home_screen.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import 'controllers/notification_controller.dart';
 
-void main() {
+void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   AwesomeNotifications().initialize(
     // set the icon to null if you want to use the default app icon
@@ -35,12 +36,12 @@ void main() {
       ],
       debug: true
   );
-  AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+  await AwesomeNotifications().isNotificationAllowed().then((isAllowed) async{
     if (!isAllowed) {
       // This is just a basic example. For real apps, you must show some
       // friendly dialog box before call the request method.
       // This is very important to not harm the user experience
-      AwesomeNotifications().requestPermissionToSendNotifications();
+      await AwesomeNotifications().requestPermissionToSendNotifications();
     }
   });
   runApp(const MyApp());
@@ -66,7 +67,7 @@ class MyApp extends StatelessWidget {
               ),
           primaryColor: kTextGreyColor,
           primaryColorLight: kBackBlackColor,
-          iconTheme: IconThemeData(color: Colors.white),
+          iconTheme: const IconThemeData(color: Colors.white),
           colorScheme: ColorScheme.fromSwatch().copyWith(
             background: kBackBlackColor,
             secondary: kTextGreyColor,

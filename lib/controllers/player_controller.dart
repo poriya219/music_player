@@ -20,6 +20,12 @@ import '../pages/home_screen/controller/home_controller.dart';
 class PlayerController extends GetxController{
 
   @override
+  void onClose() {
+    AwesomeNotifications().cancel(10);
+    super.onClose();
+  }
+
+  @override
   void onInit() {
     songListeningStream();
     super.onInit();
@@ -28,26 +34,37 @@ class PlayerController extends GetxController{
   songListeningStream(){
     player.currentIndexStream.listen((event) async{
       if(event != null){
-        Timer(const Duration(seconds: 1), () async{
-          print('add');
-          List<IndexedAudioSource> list = player.sequence ?? <IndexedAudioSource>[];
-          String songTitle = list[event].tag.title;
-          int? id;
-          final homeController = Get.find<HomeController>();
-          for(var each in homeController.songs){
-            if(each.title == songTitle){
-              id = each.id;
-              break;
+        int lastEvent = event;
+        Timer(const Duration(seconds: 1), () {
+          StreamSubscription? pStream;
+          pStream = player.positionStream.listen((pEvent) async{
+            int duration = pEvent.inSeconds;
+            if(duration == 7){
+              print('add to the list');
+              List<IndexedAudioSource> list = player.sequence ?? <IndexedAudioSource>[];
+              String songTitle = list[event].tag.title;
+              int? id;
+              final homeController = Get.find<HomeController>();
+              for(var each in homeController.songs){
+                if(each.title == songTitle){
+                  id = each.id;
+                  break;
+                }
+              }
+              final prefs = await SharedPreferences.getInstance();
+              String playCountsString = prefs.getString('playCount') ?? jsonEncode({});
+              Map map = jsonDecode(playCountsString);
+              map.putIfAbsent(id.toString(), () => 0);
+              int count = map[id.toString()] ?? 0;
+              map[id.toString()] = count + 1;
+              print('map: $map');
+              prefs.setString('playCount', jsonEncode(map));
+              if(pStream != null){
+                pStream.cancel();
+                print('Stream cancelled');
+              }
             }
-          }
-          final prefs = await SharedPreferences.getInstance();
-          String playCountsString = prefs.getString('playCount') ?? jsonEncode({});
-          Map map = jsonDecode(playCountsString);
-          map.putIfAbsent(id.toString(), () => 0);
-          int count = map[id.toString()] ?? 0;
-          map[id.toString()] = count + 1;
-          print('map: $map');
-          prefs.setString('playCount', jsonEncode(map));
+          });
         });
       }
     });
@@ -106,7 +123,6 @@ class PlayerController extends GetxController{
         await stream1.cancel();
       }
       stream1 = player.currentIndexStream.listen((event) async{
-        print('stream 1');
         setCurrentIndex(player.currentIndex ?? 0);
         String title = player.sequence![player.currentIndex ?? 0].tag.title;
         String artist = player.sequence![player.currentIndex ?? 0].tag.artist;
@@ -138,11 +154,16 @@ class PlayerController extends GetxController{
             if(stream4 != null){
               await stream4!.cancel();
             }
+            int lastProgress = 0;
             stream4 = player.positionStream.listen((poEvent) async{
               print('stream 4');
               Duration position = poEvent;
               print('current progress: ${((position.inSeconds / duration.inSeconds) * 100).toInt()}');
-              createNotification(title: title, body: artist,path: file.path,isPlaying: isPlaying,progress: ((position.inSeconds / duration.inSeconds) * 100).toInt());
+              int progress = ((position.inSeconds / duration.inSeconds) * 100).toInt();
+              if(progress > lastProgress || lastProgress == 0){
+                lastProgress = progress;
+                createNotification(title: title, body: artist,path: file.path,isPlaying: isPlaying,progress: progress);
+              }
             });
           });
         });
@@ -154,24 +175,39 @@ class PlayerController extends GetxController{
     print('path: $path');
     // AwesomeNotifications().cancel(10);
     AwesomeNotifications().createNotification(
-        content: NotificationContent(
+        content:
+        NotificationContent(
             id: 10,
             channelKey: 'play_channel',
+            category: NotificationCategory.Transport,
             title: title,
             body: body,
-            actionType: ActionType.KeepOnTop,
-          // largeIcon: ,
-          summary: isPlaying ? 'Now playing' : '',
-            bigPicture: 'file://$path',
+            summary: isPlaying ? 'Now playing' : '',
+            notificationLayout: NotificationLayout.MediaPlayer,
             largeIcon: 'file://$path',
-          color: Colors.purple.shade700,
-          category: NotificationCategory.Transport,
-          notificationLayout: NotificationLayout.MediaPlayer,
-          progress: progress,
-          locked: true,
-          showWhen: false,
-          autoDismissible: false
-        ),
+            bigPicture: 'file://$path',
+            color: Colors.purple.shade700,
+            progress: progress,
+            autoDismissible: false,
+            showWhen: false),
+        // NotificationContent(
+        //     id: 10,
+        //     channelKey: 'play_channel',
+        //     title: title,
+        //     body: body,
+        //     actionType: ActionType.KeepOnTop,
+        //   // largeIcon: ,
+        //   summary: isPlaying ? 'Now playing' : '',
+        //     bigPicture: 'file://$path',
+        //     largeIcon: 'file://$path',
+        //   color: Colors.purple.shade700,
+        //   category: NotificationCategory.Transport,
+        //   notificationLayout: NotificationLayout.MediaPlayer,
+        //   progress: progress,
+        //   locked: true,
+        //   showWhen: false,
+        //   autoDismissible: false
+        // ),
         actionButtons: [
           NotificationActionButton(
             key: "previous",
