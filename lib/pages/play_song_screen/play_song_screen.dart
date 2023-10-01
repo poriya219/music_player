@@ -54,6 +54,7 @@ class PlaySongScreen extends StatelessWidget {
                       String songTitle = list[cIndex].tag.title;
                       String songArtist = list[cIndex].tag.artist;
                       lyricsController.getLyrics(title: songTitle, artist: songArtist);
+
                       return Stack(
                         children: [
                           SizedBox(
