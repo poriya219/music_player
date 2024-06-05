@@ -6,12 +6,45 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 class AppController extends GetxController{
 
-  getSongImage(int id) async {
+  Future<Uint8List?> getSongImage(int id) async {
     // DEFAULT: ArtworkFormat.JPEG, 200 and false
     final OnAudioQuery audioQuery = OnAudioQuery();
     Uint8List? data = await audioQuery.queryArtwork(
       id,
       ArtworkType.AUDIO,
+      quality: 100,
+    );
+    return data;
+  }
+
+  Future<Uint8List?> getAlbumImage(int id) async {
+    // DEFAULT: ArtworkFormat.JPEG, 200 and false
+    final OnAudioQuery audioQuery = OnAudioQuery();
+    Uint8List? data = await audioQuery.queryArtwork(
+      id,
+      ArtworkType.ALBUM,
+      quality: 100,
+    );
+    return data;
+  }
+
+  Future<Uint8List?> getGenreImage(int id) async {
+    // DEFAULT: ArtworkFormat.JPEG, 200 and false
+    final OnAudioQuery audioQuery = OnAudioQuery();
+    Uint8List? data = await audioQuery.queryArtwork(
+      id,
+      ArtworkType.GENRE,
+      quality: 100,
+    );
+    return data;
+  }
+
+  Future<Uint8List?> getArtistImage(int id) async {
+    // DEFAULT: ArtworkFormat.JPEG, 200 and false
+    final OnAudioQuery audioQuery = OnAudioQuery();
+    Uint8List? data = await audioQuery.queryArtwork(
+      id,
+      ArtworkType.ARTIST,
       quality: 100,
     );
     return data;

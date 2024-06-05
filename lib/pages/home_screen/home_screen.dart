@@ -10,6 +10,10 @@ import 'package:just_audio/just_audio.dart';
 import 'package:music_player/constans.dart';
 import 'package:music_player/controllers/app_controller.dart';
 import 'package:music_player/controllers/player_controller.dart';
+import 'package:music_player/pages/home_screen/widgets/albums_list.dart';
+import 'package:music_player/pages/home_screen/widgets/artists_list.dart';
+import 'package:music_player/pages/home_screen/widgets/genres_list.dart';
+import 'package:music_player/pages/home_screen/widgets/playlists.dart';
 import 'package:music_player/pages/home_screen/widgets/songs_list.dart';
 import 'package:music_player/pages/search_screen/search_screen.dart';
 import 'package:on_audio_query/on_audio_query.dart';
@@ -141,6 +145,14 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     controller.selectedFilter == 'Song'
                         ? SongsList(songs: controller.songs)
+                    : controller.selectedFilter == 'Playlist'
+                        ? Playlists(playlists: controller.playLists)
+                        : controller.selectedFilter == 'Artist'
+                        ? ArtistsList(artists: controller.artists)
+                        : controller.selectedFilter == 'Album'
+                        ? AlbumsList(albums: controller.albums)
+                        : controller.selectedFilter == 'Genre'
+                        ? GenresList(genres: controller.genres)
                         : SizedBox()
                   ],
                 ),

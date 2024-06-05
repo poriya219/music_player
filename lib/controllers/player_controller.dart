@@ -78,7 +78,7 @@ class PlayerController extends GetxController{
 
   final player = AudioPlayer();
 
-  ConcatenatingAudioSource playlist = ConcatenatingAudioSource(children: []);
+  ConcatenatingAudioSource playlist = ConcatenatingAudioSource(children: [],useLazyPreparation: true);
   resetPlayList(){
     playlist = ConcatenatingAudioSource(children: []);
     update();
