@@ -9,6 +9,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:music_player/constans.dart';
 import 'package:music_player/controllers/lyrics_controller.dart';
 import 'package:music_player/controllers/player_controller.dart';
+import 'package:music_player/pages/play_song_screen/show_song_controls.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -57,22 +58,7 @@ class PlaySongScreen extends StatelessWidget {
 
                       return Stack(
                         children: [
-                          SizedBox(
-                            width: 100.w,
-                            height: 80.h,
-                            child: ShaderMask(
-                              shaderCallback: (rect) {
-                                return LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [Colors.black, Colors.transparent],
-                                ).createShader(
-                                    Rect.fromLTRB(0, 0, rect.width, rect.height));
-                              },
-                              blendMode: BlendMode.dstIn,
-                              child: artwork,
-                            ),
-                          ),
+                          ShowSongControls(artwork: artwork,),
                           SafeArea(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.end,

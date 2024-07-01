@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -8,6 +9,8 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../constans.dart';
 import '../../../controllers/app_controller.dart';
+import '../../../controllers/player_controller.dart';
+import '../../play_song_screen/play_song_screen.dart';
 
 class ListDetail extends StatelessWidget {
   final dynamic model;
@@ -31,8 +34,9 @@ class ListDetail extends StatelessWidget {
       ),
       body: SafeArea(child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 5.w),
-        child: Expanded(child: FutureBuilder(future: getList(mode: mode,model: model), builder: (context,AsyncSnapshot snapshot){
+        child: FutureBuilder(future: getList(mode: mode,model: model), builder: (context,AsyncSnapshot snapshot){
           if(snapshot.hasData && snapshot.connectionState == ConnectionState.done){
+            List<SongModel> list = snapshot.data;
             return SingleChildScrollView(
               child: Column(
                 children: [
@@ -83,30 +87,85 @@ class ListDetail extends StatelessWidget {
                         SizedBox(
                           width: 5.w,
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Text(getTitle(mode: mode, model: model)[0],
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: kTextGreyColor),
-                            ),
-                            Text(getTitle(mode: mode, model: model)[1],
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.w500,
+                        SizedBox(
+                          width: 55.w,
+                          height: 30.w,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Text(getTitle(mode: mode, model: model)[0],
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(color: kTextGreyColor),
                               ),
-                            ),
-                          ],
+                              Text(getTitle(mode: mode, model: model)[1],
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
-
+                  SizedBox(
+                    height: 2.h,
+                  ),
+                  InkWell(
+                    onTap: (){
+                      if(list.isNotEmpty){
+                        final playerController = Get.put(PlayerController());
+                        Random random = Random();
+                        int index = list.length > 1 ? random.nextInt(list.length - 1) : 1;
+                        playerController.player.setShuffleModeEnabled(true);
+                        Get.to(()=> PlaySongScreen());
+                        playerController.sourceListGetter(list: list,index: index);
+                      }
+                    },
+                    child: Container(
+                      width: 90.w,
+                      height: 7.h,
+                      decoration: BoxDecoration(
+                        color: Get.theme.primaryColor,
+                        borderRadius: BorderRadius.circular(15)
+                      ),
+                      child: Row(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(left: 7.w),
+                            child: Icon(EvaIcons.shuffle2,
+                              size: 7.w,
+                            ),
+                          ),
+                          Expanded(child: Center(child: Text('Shuffle Play',
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          ),))
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 2.h,
+                  ),
+                  ListView.builder(
+                      itemCount: list.length,
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemBuilder: (context, index){
+                        return card(songsList: list,index: index);
+                      },),
+                  SizedBox(
+                    height: 10.h,
+                  ),
                 ],
               ),
             );
@@ -114,8 +173,41 @@ class ListDetail extends StatelessWidget {
           else{
             return const SizedBox();
           }
-        })),
+        }),
       ),),
+    );
+  }
+
+  Widget card ({required List<SongModel> songsList, required int index}){
+    SongModel song = songsList[index];
+    return Padding(padding: EdgeInsets.symmetric(vertical: 1.h),
+      child: GestureDetector(
+        onTap: (){
+          final playerController = Get.put(PlayerController());
+          Get.to(()=> PlaySongScreen());
+          playerController.sourceListGetter(list: songsList,index: index);
+        },
+        child: Container(
+          color: Colors.transparent,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(song.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              SizedBox(
+                height: 0.2.h,
+              ),
+              Text(song.artist ?? 'Unknown artist',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: kTextGreyColor),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -127,6 +219,8 @@ class ListDetail extends StatelessWidget {
         return ['ARTIST - ${model.numberOfTracks} SONG','${model.artist}'];
       case ListDetailMode.genre:
         return ['GENRE - ${model.numOfSongs} SONG','${model.genre}'];
+      case ListDetailMode.playlist:
+        return ['Playlist - ${model.numOfSongs} SONG','${model.playlist}'];
       default:
         return ['',''];
     }
@@ -140,6 +234,8 @@ class ListDetail extends StatelessWidget {
         return controller.getArtistImage(id);
       case ListDetailMode.genre:
         return controller.getGenreImage(id);
+      case ListDetailMode.playlist:
+        return controller.getPlaylistImage(id);
       default:
         controller.getSongImage(id);
     }
@@ -164,6 +260,8 @@ class ListDetail extends StatelessWidget {
         return AudiosFromType.ARTIST_ID;
       case ListDetailMode.album:
         return AudiosFromType.ALBUM_ID;
+      case ListDetailMode.playlist:
+        return AudiosFromType.PLAYLIST;
       default:
         return AudiosFromType.ALBUM_ID;
     }
@@ -174,4 +272,5 @@ enum ListDetailMode {
   artist,
   album,
   genre,
+  playlist,
 }

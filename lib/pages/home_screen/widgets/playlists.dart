@@ -1,36 +1,105 @@
+import 'dart:typed_data';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:get/get.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../../constans.dart';
+import '../../../controllers/app_controller.dart';
+import 'list_detail.dart';
+
 class Playlists extends StatelessWidget {
   final List<PlaylistModel> playlists;
-  const Playlists({super.key, required this.playlists});
+  Playlists({super.key, required this.playlists});
+
+  final controller = Get.put(AppController());
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate:
-          const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,childAspectRatio: 8/7,),
-      itemCount: playlists.length,
-      shrinkWrap: true,
-      itemBuilder: (context, index) => playlistCard(
-        playlist: playlists[index],
+    return Padding(
+      padding: EdgeInsets.only(top: 1.h),
+      child: GridView.builder(
+        gridDelegate:
+            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,childAspectRatio: 9/10,),
+        itemCount: playlists.length,
+        shrinkWrap: true,
+        itemBuilder: (context, index) => playlistCard(
+          playlist: playlists[index],
+        ),
       ),
     );
   }
 
   Widget playlistCard({required PlaylistModel playlist}) {
-    print(playlist.getMap.toString());
-    print(playlist.data);
-    return Column(
-      children: [
-        Container(
-          width: 40.w,
-          height: 40.w,
-          child: Center(child: Text('still in progress :(')),
-        ),
-      ],
+    return GestureDetector(
+      onTap: (){
+        Get.to(()=> ListDetail(model: playlist,mode: ListDetailMode.playlist,));
+      },
+      child: Column(
+        children: [
+          SizedBox(
+            width: 40.w,
+            height: 40.w,
+            child: FutureBuilder(future: controller.getPlaylistImage(playlist.id), builder: (context, AsyncSnapshot snapshot){
+              if(snapshot.connectionState == ConnectionState.done && snapshot.hasData){
+                Uint8List? data = snapshot.data;
+                if(data != null){
+                  return Image.memory(data,
+                    width: 40.w,
+                    height: 40.w,
+                    fit: BoxFit.cover,
+                  );
+                }
+                else{
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Image.asset('assets/images/bd.png',
+                      width: 40.w,
+                      height: 40.w,
+                      fit: BoxFit.cover,
+                    ),
+                  );
+                }
+              }
+              else{
+                return ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: Image.asset('assets/images/gd.png',
+                    width: 40.w,
+                    height: 40.w,
+                    fit: BoxFit.cover,
+                  ),
+                );
+              }
+            }),
+          ),
+          SizedBox(
+            height: 0.5.h,
+          ),
+          SizedBox(
+            width: 40.w,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(playlist.playlist,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(
+                  height: 0.2.h,
+                ),
+                Text('Total ${playlist.numOfSongs} songs',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: kTextGreyColor),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

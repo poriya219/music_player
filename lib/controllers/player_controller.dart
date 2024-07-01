@@ -114,7 +114,13 @@ class PlayerController extends GetxController{
         // print('====================================================== $list');
       }
       player.setAudioSource(playlist,initialIndex: index);
-      player.play();
+      player.play().then((value) {
+        final appController = Get.find<AppController>();
+        print('################################set 2 $index');
+
+        appController.seekSliderController(1);
+      });
+
       StreamSubscription? stream1;
       StreamSubscription? stream2;
       StreamSubscription? stream3;
@@ -139,6 +145,7 @@ class PlayerController extends GetxController{
           final Uint8List listBytes = bytes.buffer.asUint8List();
           await file.writeAsBytes(listBytes);
         }
+        createNotification(title: title, body: artist,path: file.path,isPlaying: isPlaying,progress: 0);
         if(stream2 != null){
           await stream2!.cancel();
         }
@@ -151,20 +158,19 @@ class PlayerController extends GetxController{
           stream3 = player.durationStream.listen((dEvent) async{
             print('stream 3');
             Duration duration = dEvent ?? const Duration(seconds: 1);
-            if(stream4 != null){
-              await stream4!.cancel();
-            }
-            int lastProgress = 0;
-            stream4 = player.positionStream.listen((poEvent) async{
-              print('stream 4');
-              Duration position = poEvent;
-              print('current progress: ${((position.inSeconds / duration.inSeconds) * 100).toInt()}');
-              int progress = ((position.inSeconds / duration.inSeconds) * 100).toInt();
-              if(progress > lastProgress || lastProgress == 0){
-                lastProgress = progress;
-                createNotification(title: title, body: artist,path: file.path,isPlaying: isPlaying,progress: progress);
-              }
-            });
+            // if(stream4 != null){
+            //   await stream4!.cancel();
+            // }
+            // int lastProgress = 0;
+            // stream4 = player.positionStream.listen((poEvent) async{
+            //   print('stream 4');
+            //   Duration position = poEvent;
+            //   print('current progress: ${((position.inSeconds / duration.inSeconds) * 100).toInt()}');
+            //   int progress = ((position.inSeconds / duration.inSeconds) * 100).toInt();
+            //   if(progress > lastProgress || lastProgress == 0){
+            //     lastProgress = progress;
+            //   }
+            // });
           });
         });
       });

@@ -149,12 +149,12 @@ class SongsList extends StatelessWidget {
 
   Widget songsCard(List<SongModel> songsList, SongModel song,int index){
     return GestureDetector(
-      onTap: (){
+      onTap: () async{
         final playerController = Get.put(PlayerController());
           // playerController.initialPlay(path: song.data);
         print('index: $index');
+        await playerController.sourceListGetter(list: songsList,index: index);
         Get.to(()=> PlaySongScreen());
-        playerController.sourceListGetter(list: songsList,index: index);
       },
       child: Container(
         width: 90.w,

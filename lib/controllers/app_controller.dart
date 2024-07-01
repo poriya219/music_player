@@ -1,10 +1,29 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:get/get.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:widget_slider/controller.dart';
 
 class AppController extends GetxController{
+
+  final SliderController sliderController = SliderController();
+
+  bool isSeeking = false;
+  setIsSeeking(bool value){
+    isSeeking = value;
+    update();
+  }
+
+  seekSliderController(int index){
+    isSeeking = true;
+    sliderController.moveTo!.call(index);
+    update();
+    Timer(const Duration(milliseconds: 300), () {
+      setIsSeeking(false);
+    });
+  }
 
   Future<Uint8List?> getSongImage(int id) async {
     // DEFAULT: ArtworkFormat.JPEG, 200 and false
@@ -34,6 +53,17 @@ class AppController extends GetxController{
     Uint8List? data = await audioQuery.queryArtwork(
       id,
       ArtworkType.GENRE,
+      quality: 100,
+    );
+    return data;
+  }
+
+  Future<Uint8List?> getPlaylistImage(int id) async {
+    // DEFAULT: ArtworkFormat.JPEG, 200 and false
+    final OnAudioQuery audioQuery = OnAudioQuery();
+    Uint8List? data = await audioQuery.queryArtwork(
+      id,
+      ArtworkType.PLAYLIST,
       quality: 100,
     );
     return data;
