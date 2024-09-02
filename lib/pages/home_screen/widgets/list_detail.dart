@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,6 +12,7 @@ import '../../../constans.dart';
 import '../../../controllers/app_controller.dart';
 import '../../../controllers/player_controller.dart';
 import '../../play_song_screen/play_song_screen.dart';
+import '../controller/home_controller.dart';
 
 class ListDetail extends StatelessWidget {
   final dynamic model;
@@ -47,7 +49,7 @@ class ListDetail extends StatelessWidget {
                         SizedBox(
                           width: 30.w,
                           height: 30.w,
-                          child: FutureBuilder(future: getImage(mode: mode, id: model.id),
+                          child: FutureBuilder(future: getImage(mode: mode, id: mode == ListDetailMode.song ? (model.isEmpty ? 0 : model[0].id) : model.id),
                               builder: (context, AsyncSnapshot snapshot){
                             if(snapshot.connectionState == ConnectionState.done && snapshot.hasData){
                               Uint8List? data = snapshot.data;
@@ -189,21 +191,99 @@ class ListDetail extends StatelessWidget {
         },
         child: Container(
           color: Colors.transparent,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              Text(song.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(song.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(
+                      height: 0.2.h,
+                    ),
+                    Text(song.artist ?? 'Unknown artist',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: kTextGreyColor),
+                    ),
+                  ],
+                ),
               ),
-              SizedBox(
-                height: 0.2.h,
-              ),
-              Text(song.artist ?? 'Unknown artist',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: kTextGreyColor),
-              ),
+              DropdownButtonHideUnderline(
+                child: DropdownButton2(
+                  customButton: Icon(
+                    Icons.more_vert,
+                    size: 6.w,
+                    // color: Colors.red,
+                  ),
+                  items: [
+                    DropdownMenuItem(
+                      value: mode == ListDetailMode.playlist ? 0 : 1,
+                      child: Text(mode == ListDetailMode.playlist ? 'Remove from playlist' : 'Add to playlist'),
+                    ),
+                  ],
+                  onChanged: (value) async{
+                    switch(value){
+                      case 0:
+                        final OnAudioQuery audioQuery = OnAudioQuery();
+                        print(model.id);
+                        print(song.id);
+                        bool status = await audioQuery.removeFromPlaylist(model.id, song.id);
+                        print('status is: $status');
+                        // Get.back();
+                        kShowToast('Song removed from playlist');
+                        final controller = Get.find<HomeController>();
+                        controller.resetPlaylists();
+                      case 1:
+                        final homeController = Get.find<HomeController>();
+                        kShowDialog(
+                            verticalPadding: 30.h,
+                            child: ListView.builder(
+                              itemCount: homeController.playLists.length,
+                              shrinkWrap: true,
+                              itemBuilder: (context,index){
+                                PlaylistModel playlist = homeController.playLists[index];
+                                return Card(
+                                  child: InkWell(
+                                    onTap: (){
+                                      print(playlist.id);
+                                      print(song.id);
+                                      kAddToPlaylist(playlistId: playlist.id, audioId: song.id);
+                                    },
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 5.w,vertical: 1.5.h),
+                                      child: Text(
+                                        playlist.playlist,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ));
+                    }
+                  },
+                  dropdownStyleData: DropdownStyleData(
+                    width: 50.w,
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4),
+                      // color: Colors.redAccent,
+                    ),
+                    offset: const Offset(0, 8),
+                  ),
+                  menuItemStyleData: MenuItemStyleData(
+                    // customHeights: [
+                    //   ...List<double>.filled(MenuItems.firstItems.length, 48),
+                    //   8,
+                    //   ...List<double>.filled(MenuItems.secondItems.length, 48),
+                    // ],
+                    padding: const EdgeInsets.only(left: 16, right: 16),
+                  ),
+                ),
+              )
             ],
           ),
         ),
@@ -221,6 +301,8 @@ class ListDetail extends StatelessWidget {
         return ['GENRE - ${model.numOfSongs} SONG','${model.genre}'];
       case ListDetailMode.playlist:
         return ['Playlist - ${model.numOfSongs} SONG','${model.playlist}'];
+        case ListDetailMode.song:
+        return ['Liked Songs - ${model.length} SONG',''];
       default:
         return ['',''];
     }
@@ -237,15 +319,20 @@ class ListDetail extends StatelessWidget {
       case ListDetailMode.playlist:
         return controller.getPlaylistImage(id);
       default:
-        controller.getSongImage(id);
+        return controller.getSongImage(id);
     }
   }
 
   Future<List<SongModel>> getList({required dynamic model, required ListDetailMode mode}) async{
     try{
-      OnAudioQuery onAudioQuery = OnAudioQuery();
-      var list = await onAudioQuery.queryAudiosFrom(getType(mode: mode), model.id);
-      return list;
+      if(mode == ListDetailMode.song){
+        return model;
+      }
+      else{
+        OnAudioQuery onAudioQuery = OnAudioQuery();
+        var list = await onAudioQuery.queryAudiosFrom(getType(mode: mode), model.id);
+        return list;
+      }
     }
         catch(e){
       return [];
@@ -273,4 +360,5 @@ enum ListDetailMode {
   album,
   genre,
   playlist,
+  song,
 }

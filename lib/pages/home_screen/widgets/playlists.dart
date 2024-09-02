@@ -8,6 +8,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../constans.dart';
 import '../../../controllers/app_controller.dart';
+import '../controller/home_controller.dart';
 import 'list_detail.dart';
 
 class Playlists extends StatelessWidget {
@@ -37,6 +38,33 @@ class Playlists extends StatelessWidget {
       onTap: (){
         Get.to(()=> ListDetail(model: playlist,mode: ListDetailMode.playlist,));
       },
+      onLongPress: (){
+        kShowDialog(
+            verticalPadding: 30.h,
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                Card(
+                  child: InkWell(
+                    onTap: () async{
+                      final OnAudioQuery audioQuery = OnAudioQuery();
+                      await audioQuery.removePlaylist(playlist.id);
+                      Get.back();
+                      kShowToast('Playlist Removed');
+                      final controller = Get.find<HomeController>();
+                      controller.resetPlaylists();
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 5.w,vertical: 1.5.h),
+                      child: const Text(
+                        'Remove Playlist',
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ));
+      },
       child: Column(
         children: [
           SizedBox(
@@ -46,10 +74,13 @@ class Playlists extends StatelessWidget {
               if(snapshot.connectionState == ConnectionState.done && snapshot.hasData){
                 Uint8List? data = snapshot.data;
                 if(data != null){
-                  return Image.memory(data,
-                    width: 40.w,
-                    height: 40.w,
-                    fit: BoxFit.cover,
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Image.memory(data,
+                      width: 40.w,
+                      height: 40.w,
+                      fit: BoxFit.cover,
+                    ),
                   );
                 }
                 else{

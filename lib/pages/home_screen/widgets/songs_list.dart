@@ -1,11 +1,13 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:music_player/controllers/app_controller.dart';
 import 'package:music_player/controllers/player_controller.dart';
+import 'package:music_player/pages/home_screen/controller/home_controller.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -218,6 +220,71 @@ class SongsList extends StatelessWidget {
               width: 5.w,
             ),
             Text(controller.durationGenerator(song.duration ?? 0),style: TextStyle(color: kTextGreyColor),),
+            SizedBox(
+              width: 3.w,
+            ),
+            DropdownButtonHideUnderline(
+          child: DropdownButton2(
+            customButton: Icon(
+              Icons.more_vert,
+              size: 6.w,
+              // color: Colors.red,
+            ),
+            items: const [
+              DropdownMenuItem(
+                value: 0,
+                child: Text('Add to playlist'),
+              ),
+            ],
+            onChanged: (value) {
+              switch(value){
+                case 0:
+                  final homeController = Get.find<HomeController>();
+                  kShowDialog(
+                      verticalPadding: 30.h,
+                      child: ListView.builder(
+                    itemCount: homeController.playLists.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context,index){
+                      PlaylistModel playlist = homeController.playLists[index];
+                      return Card(
+                        child: InkWell(
+                          onTap: (){
+                            print(playlist.id);
+                            print(song.id);
+                            kAddToPlaylist(playlistId: playlist.id, audioId: song.id);
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 5.w,vertical: 1.5.h),
+                            child: Text(
+                              playlist.playlist,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ));
+              }
+            },
+            dropdownStyleData: DropdownStyleData(
+              width: 50.w,
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(4),
+                // color: Colors.redAccent,
+              ),
+              offset: const Offset(0, 8),
+            ),
+            menuItemStyleData: MenuItemStyleData(
+              // customHeights: [
+              //   ...List<double>.filled(MenuItems.firstItems.length, 48),
+              //   8,
+              //   ...List<double>.filled(MenuItems.secondItems.length, 48),
+              // ],
+              padding: const EdgeInsets.only(left: 16, right: 16),
+            ),
+          ),
+        ),
           ],
         ),
       ),

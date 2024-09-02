@@ -5,11 +5,13 @@ import 'dart:isolate';
 import 'dart:typed_data';
 import 'dart:ui';
 
-import 'package:awesome_notifications/awesome_notifications.dart';
+// import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:music_player/controllers/app_controller.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:path_provider/path_provider.dart';
@@ -18,12 +20,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../pages/home_screen/controller/home_controller.dart';
 
 class PlayerController extends GetxController{
-
-  @override
-  void onClose() {
-    AwesomeNotifications().cancel(10);
-    super.onClose();
-  }
 
   @override
   void onInit() {
@@ -92,23 +88,32 @@ class PlayerController extends GetxController{
 
   sourceListGetter({required List<SongModel> list,required int index}) async{
     if(list.isNotEmpty){
+      // final appController = Get.find<AppController>();
       resetPlayList();
       setCurrentIndex(index);
       for(var each in list){
+        // Uint8List ad = await appController.getSongImage(each.id) ?? Uint8List(0);
         playlist.add(AudioSource.uri(Uri.file(each.data),
-          tag: AudioMetadata(
-            album: each.album!,
+          tag: MediaItem(
+            id: each.id.toString(),
             title: each.title,
-            artist: each.artist ?? '',
-            artwork:
-            QueryArtworkWidget(
-                artworkBorder: BorderRadius.circular(20),
-                artworkQuality: FilterQuality.high,
-                size: 5000,
-                quality: 100,
-                format: ArtworkFormat.JPEG,
-                id: each.id, type: ArtworkType.AUDIO),
+            album: each.album,
+            artist: each.artist,
+            // artUri: await getImageFileFromAssets(data: ad,id: each.id),
           ),
+          // tag: AudioMetadata(
+          //   album: each.album!,
+          //   title: each.title,
+          //   artist: each.artist ?? '',
+          //   artwork:
+          //   QueryArtworkWidget(
+          //       artworkBorder: BorderRadius.circular(20),
+          //       artworkQuality: FilterQuality.high,
+          //       size: 5000,
+          //       quality: 100,
+          //       format: ArtworkFormat.JPEG,
+          //       id: each.id, type: ArtworkType.AUDIO),
+          // ),
         ),
         );
         // print('====================================================== $list');
@@ -145,7 +150,7 @@ class PlayerController extends GetxController{
           final Uint8List listBytes = bytes.buffer.asUint8List();
           await file.writeAsBytes(listBytes);
         }
-        createNotification(title: title, body: artist,path: file.path,isPlaying: isPlaying,progress: 0);
+        // createNotification(title: title, body: artist,path: file.path,isPlaying: isPlaying,progress: 0);
         if(stream2 != null){
           await stream2!.cancel();
         }
@@ -157,7 +162,7 @@ class PlayerController extends GetxController{
           }
           stream3 = player.durationStream.listen((dEvent) async{
             print('stream 3');
-            Duration duration = dEvent ?? const Duration(seconds: 1);
+            // Duration duration = dEvent ?? const Duration(seconds: 1);
             // if(stream4 != null){
             //   await stream4!.cancel();
             // }
@@ -177,68 +182,68 @@ class PlayerController extends GetxController{
     }
   }
 
-  createNotification({required String title, required String body,required String path,required bool isPlaying, required int progress}){
-    print('path: $path');
-    // AwesomeNotifications().cancel(10);
-    AwesomeNotifications().createNotification(
-        content:
-        NotificationContent(
-            id: 10,
-            channelKey: 'play_channel',
-            category: NotificationCategory.Transport,
-            title: title,
-            body: body,
-            summary: isPlaying ? 'Now playing' : '',
-            notificationLayout: NotificationLayout.MediaPlayer,
-            largeIcon: 'file://$path',
-            bigPicture: 'file://$path',
-            color: Colors.purple.shade700,
-            progress: progress,
-            autoDismissible: false,
-            showWhen: false),
-        // NotificationContent(
-        //     id: 10,
-        //     channelKey: 'play_channel',
-        //     title: title,
-        //     body: body,
-        //     actionType: ActionType.KeepOnTop,
-        //   // largeIcon: ,
-        //   summary: isPlaying ? 'Now playing' : '',
-        //     bigPicture: 'file://$path',
-        //     largeIcon: 'file://$path',
-        //   color: Colors.purple.shade700,
-        //   category: NotificationCategory.Transport,
-        //   notificationLayout: NotificationLayout.MediaPlayer,
-        //   progress: progress,
-        //   locked: true,
-        //   showWhen: false,
-        //   autoDismissible: false
-        // ),
-        actionButtons: [
-          NotificationActionButton(
-            key: "previous",
-            label: "Previous",
-            icon: 'resource://drawable/pre',
-            autoDismissible: false,
-          ),
-          NotificationActionButton(
-            key: "play",
-            label: "Play",
-            icon: isPlaying ? 'resource://drawable/pa' : 'resource://drawable/p',
-            color: Colors.white,
-            autoDismissible: false,
-          ),
-          NotificationActionButton(
-            key: "next",
-            label: "Next",
-            icon: 'resource://drawable/n',
-            color: Colors.white,
-            autoDismissible: false,
-          ),
-        ],
-    // );
-    );
-  }
+  // createNotification({required String title, required String body,required String path,required bool isPlaying, required int progress}){
+  //   print('path: $path');
+  //   // AwesomeNotifications().cancel(10);
+  //   AwesomeNotifications().createNotification(
+  //       content:
+  //       NotificationContent(
+  //           id: 10,
+  //           channelKey: 'play_channel',
+  //           category: NotificationCategory.Transport,
+  //           title: title,
+  //           body: body,
+  //           summary: isPlaying ? 'Now playing' : '',
+  //           notificationLayout: NotificationLayout.MediaPlayer,
+  //           largeIcon: 'file://$path',
+  //           bigPicture: 'file://$path',
+  //           color: Colors.purple.shade700,
+  //           progress: progress,
+  //           autoDismissible: false,
+  //           showWhen: false),
+  //       // NotificationContent(
+  //       //     id: 10,
+  //       //     channelKey: 'play_channel',
+  //       //     title: title,
+  //       //     body: body,
+  //       //     actionType: ActionType.KeepOnTop,
+  //       //   // largeIcon: ,
+  //       //   summary: isPlaying ? 'Now playing' : '',
+  //       //     bigPicture: 'file://$path',
+  //       //     largeIcon: 'file://$path',
+  //       //   color: Colors.purple.shade700,
+  //       //   category: NotificationCategory.Transport,
+  //       //   notificationLayout: NotificationLayout.MediaPlayer,
+  //       //   progress: progress,
+  //       //   locked: true,
+  //       //   showWhen: false,
+  //       //   autoDismissible: false
+  //       // ),
+  //       actionButtons: [
+  //         NotificationActionButton(
+  //           key: "previous",
+  //           label: "Previous",
+  //           icon: 'resource://drawable/pre',
+  //           autoDismissible: false,
+  //         ),
+  //         NotificationActionButton(
+  //           key: "play",
+  //           label: "Play",
+  //           icon: isPlaying ? 'resource://drawable/pa' : 'resource://drawable/p',
+  //           color: Colors.white,
+  //           autoDismissible: false,
+  //         ),
+  //         NotificationActionButton(
+  //           key: "next",
+  //           label: "Next",
+  //           icon: 'resource://drawable/n',
+  //           color: Colors.white,
+  //           autoDismissible: false,
+  //         ),
+  //       ],
+  //   // );
+  //   );
+  // }
 
   initialPlay({required String path}) async{
     if(isPlaying){
@@ -310,4 +315,12 @@ class AudioMetadata {
     required this.artist,
     required this.artwork,
   });
+}
+
+Future<Uri> getImageFileFromAssets({required Uint8List data,required int id}) async {
+  Directory tempDir =  await getApplicationDocumentsDirectory();
+  String tempPath = tempDir.path;
+  var filePath = '$tempPath/file_$id.png'; // file_01.tmp is dump file, can be anything
+  return (await File(filePath).writeAsBytes(data))
+      .uri;
 }

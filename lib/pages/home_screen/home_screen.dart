@@ -12,6 +12,7 @@ import 'package:music_player/controllers/player_controller.dart';
 import 'package:music_player/pages/home_screen/widgets/albums_list.dart';
 import 'package:music_player/pages/home_screen/widgets/artists_list.dart';
 import 'package:music_player/pages/home_screen/widgets/genres_list.dart';
+import 'package:music_player/pages/home_screen/widgets/list_detail.dart';
 import 'package:music_player/pages/home_screen/widgets/playlists.dart';
 import 'package:music_player/pages/home_screen/widgets/songs_list.dart';
 import 'package:music_player/pages/search_screen/search_screen.dart';
@@ -39,7 +40,48 @@ class HomeScreen extends StatelessWidget {
       return Scaffold(
         key: _key,
         floatingActionButton: hController.selectedFilter == 'Playlist' ? FloatingActionButton(
-          onPressed: (){},
+          onPressed: (){
+            TextEditingController textEditingController = TextEditingController();
+            kShowDialog(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    const Text('New Playlist'),
+                    TextField(
+                      controller: textEditingController,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(onPressed: (){
+                          Get.back();
+                        }, child: const Text('Cancel')),
+                        TextButton(onPressed: () async{
+                          try{
+                            final OnAudioQuery audioQuery = OnAudioQuery();
+                            bool status = await audioQuery.createPlaylist(textEditingController.text);
+                            if(status){
+                              kShowToast('Playlist Created');
+                              Get.back();
+                              hController.resetPlaylists();
+                            }
+                            else{
+                              kShowToast('error');
+                              Get.back();
+                            }
+                          }
+                              catch(e){
+                            kShowToast('error');
+                            Get.back();
+                              }
+                        }, child: const Text('Create')),
+                      ],
+                    ),
+                  ],
+                ),
+                verticalPadding: 35.h,
+            );
+          },
           backgroundColor: kBlueColor,
           child: const Icon(Icons.add),
         ) : null,
@@ -49,7 +91,27 @@ class HomeScreen extends StatelessWidget {
               return Padding(
                 padding: EdgeInsets.symmetric(horizontal: 5.w,vertical: 2.h),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    drawerButton(title: 'Liked Songs', onTap: () async{
+                      Get.back();
+                      final prefs = await SharedPreferences.getInstance();
+                      List<String> likedSongs = prefs.getStringList('LikedSongs') ?? <String>[];
+                      List<SongModel> songs = [];
+                      for(SongModel song in hController.songs){
+                        QueryArtworkWidget a = QueryArtworkWidget(
+                            artworkBorder: BorderRadius.circular(20),
+                            artworkQuality: FilterQuality.high,
+                            size: 5000,
+                            quality: 100,
+                            format: ArtworkFormat.JPEG,
+                            id: song.id, type: ArtworkType.AUDIO);
+                        if(likedSongs.contains(a.id.toString())){
+                          songs.add(song);
+                        }
+                      }
+                      Get.to(()=> ListDetail(model: songs,mode: ListDetailMode.song,));
+                    }),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -99,10 +161,12 @@ class HomeScreen extends StatelessWidget {
                       ],
                     ),
                     const Spacer(),
-                    Text('${appController.appName} ${appController.version}',
-                      style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w500
+                    Center(
+                      child: Text('${appController.appName} ${appController.version}',
+                        style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500
+                        ),
                       ),
                     ),
                   ],
@@ -147,7 +211,13 @@ class HomeScreen extends StatelessWidget {
                               snapshot.data ??
                                   <IndexedAudioSource>[];
                           QueryArtworkWidget artwork = list.isEmpty ? const QueryArtworkWidget(id: 0, type: ArtworkType.AUDIO) :
-                          list[cIndex].tag.artwork;
+                          QueryArtworkWidget(
+                              artworkBorder: BorderRadius.circular(20),
+                              artworkQuality: FilterQuality.high,
+                              size: 5000,
+                              quality: 100,
+                              format: ArtworkFormat.JPEG,
+                              id: int.parse(list[cIndex].tag.id), type: ArtworkType.AUDIO);
                           String songTitle = list.isEmpty ? 'Unknown' : list[cIndex].tag.title;
                           String songArtist =
                           list.isEmpty ? 'Unknown' : list[cIndex].tag.artist;
@@ -302,7 +372,7 @@ class HomeScreen extends StatelessWidget {
                                         Positioned(
                                             left: 4.w,
                                             bottom: 2.h,
-                                            child: FutureBuilder(
+                                            child: controller.isGrantedPermission ? FutureBuilder(
                                                 future: appController
                                                     .getSongImage(
                                                     artwork.id),
@@ -328,7 +398,13 @@ class HomeScreen extends StatelessWidget {
                                                   } else {
                                                     return SizedBox();
                                                   }
-                                                })),
+                                                }) : CircleAvatar(
+                                                radius: 7.w,
+                                                foregroundColor:
+                                                kBlueColor,
+                                                backgroundColor:
+                                                kBlueColor,
+                                                )),
                                       ],
                                     ),
                                   ),
@@ -399,6 +475,19 @@ class HomeScreen extends StatelessWidget {
         ),
       );
     });
+  }
+
+  Widget drawerButton({required String title, required Function onTap}){
+    return InkWell(
+      onTap: ()=> onTap(),
+      child: Container(
+        color: Colors.transparent,
+        padding: EdgeInsets.symmetric(vertical: 1.h),
+        child: Card(
+          child: Text(title,style: TextStyle(fontWeight: FontWeight.w500,fontSize: 16.sp),),
+        ),
+      ),
+    );
   }
 
   int sliderIndexGetter(String title){

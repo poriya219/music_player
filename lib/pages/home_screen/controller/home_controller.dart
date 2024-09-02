@@ -1,6 +1,3 @@
-import 'dart:typed_data';
-
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:get/get.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
@@ -10,6 +7,12 @@ class HomeController extends GetxController{
   void onInit() {
     getSongs();
     super.onInit();
+  }
+
+  bool isGrantedPermission = false;
+  setIsGranted(){
+    isGrantedPermission = true;
+    update();
   }
 
   getSongs() async{
@@ -26,7 +29,15 @@ class HomeController extends GetxController{
     }
   }
 
+  resetPlaylists() async{
+    final OnAudioQuery audioQuery = OnAudioQuery();
+    List<PlaylistModel> pl = await audioQuery.queryPlaylists();
+    playLists = pl;
+    update();
+  }
+
   getLists() async{
+    setIsGranted();
     final OnAudioQuery audioQuery = OnAudioQuery();
     List<AlbumModel> al = await audioQuery.queryAlbums();
     List<ArtistModel> ar = await audioQuery.queryArtists();
