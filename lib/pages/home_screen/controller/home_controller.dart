@@ -1,5 +1,12 @@
+import 'dart:io';
+import 'dart:isolate';
+import 'dart:typed_data';
+
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:music_player/controllers/app_controller.dart';
 import 'package:on_audio_query/on_audio_query.dart';
+import 'package:path_provider/path_provider.dart';
 
 class HomeController extends GetxController{
 
@@ -50,6 +57,7 @@ class HomeController extends GetxController{
     playLists = pl;
     genres = ge;
     update();
+    getArtworks();
   }
 
   List<SongModel> songs = [];
@@ -63,6 +71,31 @@ class HomeController extends GetxController{
   setSelectedFilter(String value){
     selectedFilter = value;
     update();
+  }
+
+  getArtworks() async{
+    Directory tempDir =  await getApplicationDocumentsDirectory();
+    String tp = tempDir.path;
+    List<int> ids = List.generate(songs.length, (index) => songs[index].id);
+    var rootToken = RootIsolateToken.instance!;
+    final ByteData bytes = await rootBundle.load('assets/images/gd.png');
+    final Uint8List listBytes = bytes.buffer.asUint8List();
+    Isolate.spawn((List message) async{
+      List<int> list = message[0] ?? [];
+      String tempPath = message[1] ?? '';
+      BackgroundIsolateBinaryMessenger.ensureInitialized(message[2]);
+      Uint8List defaultData = message[3] ?? Uint8List(0);
+      final OnAudioQuery audioQuery = OnAudioQuery();
+      for(int each in list){
+        var filePath = '$tempPath/file_$each.png';
+        Uint8List? data = await audioQuery.queryArtwork(
+          each,
+          ArtworkType.AUDIO,
+          quality: 100,
+        );
+        await File(filePath).writeAsBytes(data ?? defaultData);
+      }
+    }, [ids,tp,rootToken,listBytes]);
   }
 
 }

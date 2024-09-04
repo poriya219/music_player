@@ -1,6 +1,3 @@
-import 'dart:math';
-
-// import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -9,7 +6,6 @@ import 'package:music_player/pages/home_screen/home_screen.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import 'bindings.dart';
-import 'controllers/notification_controller.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,51 +14,14 @@ void main() async{
     androidNotificationChannelName: 'play channel',
     androidNotificationOngoing: true,
   );
-  // AwesomeNotifications().initialize(
-  //   // set the icon to null if you want to use the default app icon
-  //   //   'resource://drawable/res_app_icon',
-  //   null,
-  //     [
-  //       NotificationChannel(
-  //           channelGroupKey: 'play_channel_group',
-  //           channelKey: 'play_channel',
-  //           channelName: 'Play notifications',
-  //           channelDescription: 'Notification channel for Play Music',
-  //           defaultColor: Color(0xFF9D50DD),
-  //           playSound: false,
-  //           enableVibration: false,
-  //           enableLights: false,
-  //           importance: NotificationImportance.High,
-  //           ledColor: Colors.white)
-  //     ],
-  //     // Channel groups are only visual and are not required
-  //     channelGroups: [
-  //       NotificationChannelGroup(
-  //           channelGroupKey: 'play_channel_group',
-  //           channelGroupName: 'Play group')
-  //     ],
-  //     debug: true
-  // );
-  // await AwesomeNotifications().isNotificationAllowed().then((isAllowed) async{
-  //   if (!isAllowed) {
-  //     // This is just a basic example. For real apps, you must show some
-  //     // friendly dialog box before call the request method.
-  //     // This is very important to not harm the user experience
-  //     await AwesomeNotifications().requestPermissionToSendNotifications();
-  //   }
-  // });
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    // AwesomeNotifications().setListeners(
-    //   onActionReceivedMethod: (ReceivedAction receivedAction) => NotificationController.onActionReceivedMethod(receivedAction),
-    // );
     return ResponsiveSizer(builder: (context, orientation, screenType) {
       return GetMaterialApp(
         title: 'Music Player',

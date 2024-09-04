@@ -37,6 +37,7 @@ class LyricsController extends GetxController {
       print('lyrics: ${lyrics.first.innerText}');
       setLyricsString(lyrics.first.innerText);
     } catch (e) {
+      setLyricsString('No lyrics');
       print(e);
     }
   }

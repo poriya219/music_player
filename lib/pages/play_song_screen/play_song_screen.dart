@@ -13,6 +13,7 @@ import 'package:music_player/pages/play_song_screen/show_song_controls.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:widget_slider/widget_slider.dart';
 
 import '../home_screen/controller/home_controller.dart';
 
@@ -52,17 +53,52 @@ class PlaySongScreen extends StatelessWidget {
                       iSnapshot.hasData ? QueryArtworkWidget(
                           artworkBorder: BorderRadius.circular(20),
                           artworkQuality: FilterQuality.high,
+                          nullArtworkWidget: Image.asset('assets/images/gd.png',height: 80.h,fit: BoxFit.fitHeight,),
                           size: 5000,
                           quality: 100,
                           format: ArtworkFormat.JPEG,
-                          id: int.parse(list[cIndex].tag.id), type: ArtworkType.AUDIO) : QueryArtworkWidget(id: 0, type: ArtworkType.AUDIO);
+                          id: int.parse(list[cIndex].tag.id), type: ArtworkType.AUDIO) : const QueryArtworkWidget(id: 0, type: ArtworkType.AUDIO);
                   String songTitle = iSnapshot.hasData ? list[cIndex].tag.title : 'Unknown';
                   String songArtist = iSnapshot.hasData ? list[cIndex].tag.artist : 'Unknown';
                   lyricsController.getLyrics(title: songTitle, artist: songArtist);
-
                   return Stack(
                     children: [
-                      ShowSongControls(artwork: artwork,),
+                      WidgetSlider(
+                          itemCount: 3,
+                          proximity: 1,
+                          fixedSize: 80.h,
+                          controller: controller.sliderController,
+                          onMove: (i){
+                            if(!controller.isSeeking){
+                              print('current index: $i');
+                              print('current cIndex: $cIndex');
+                              print('###################################set 1');
+                              controller.seekSliderController(1);
+                              if(i == 2){
+                                controller.player
+                                    .seekToNext();
+                              }
+                              else if(i == 0){
+                                controller.player
+                                    .seekToPrevious();
+                              }
+                            }
+                          },
+                          transformCurve: const ElasticOutCurve(),
+                          sizeDistinction: 0.99,
+                          itemBuilder: (context, index, activeIndex){
+                        return ShowSongControls(artwork: artwork,);
+                      }),
+                      Container(
+                        height: 15.h,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Colors.black,Colors.transparent],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                        ),
+                      ),
                       SafeArea(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -107,10 +143,11 @@ class PlaySongScreen extends StatelessWidget {
                                           ),
                                           Text(songArtist,
                                             style: TextStyle(
-                                              color: kTextGreyColor,
+                                              color: Colors.white,
                                               fontWeight: FontWeight.w500,
                                               fontSize: 16.sp,
                                             ),
+                                            maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           )
                                         ],

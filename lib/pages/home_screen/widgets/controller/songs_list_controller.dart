@@ -30,9 +30,7 @@ class SongsListController extends GetxController{
     final prefs = await SharedPreferences.getInstance();
     String playCounts = prefs.getString('playCount') ?? jsonEncode({});
     Map playCountMap = jsonDecode(playCounts);
-    print('playCounts: $playCountMap');
     if(value == 0){
-      print('return list');
       return list;
     }
     else if(value == 1){
@@ -41,7 +39,6 @@ class SongsListController extends GetxController{
       return temp;
     }
     else{
-      print('return default list');
       return list;
     }
   }
