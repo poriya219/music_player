@@ -21,11 +21,8 @@ class LyricsController extends GetxController {
           .timeout(const Duration(seconds: 40));
 
       final document = XmlDocument.parse(response.body);
-      print('document: $document');
       Iterable<XmlElement> lyricId = document.findAllElements('LyricId');
       Iterable<XmlElement> checkSum = document.findAllElements('LyricChecksum');
-      print('lyricId : ${lyricId.first.innerText}');
-      print('checkSum : ${checkSum.first.innerText}');
       final lyricsResponse = await http
           .get(
             Uri.parse(
@@ -34,11 +31,9 @@ class LyricsController extends GetxController {
           .timeout(const Duration(seconds: 40));
       final lyricsDocument = XmlDocument.parse(lyricsResponse.body);
       Iterable<XmlElement> lyrics = lyricsDocument.findAllElements('Lyric');
-      print('lyrics: ${lyrics.first.innerText}');
       setLyricsString(lyrics.first.innerText);
     } catch (e) {
       setLyricsString('No lyrics');
-      print(e);
     }
   }
 }
