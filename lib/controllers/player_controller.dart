@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -114,19 +113,6 @@ class PlayerController extends GetxController{
         setCurrentIndex(player.currentIndex ?? 0);
         // String title = player.sequence![player.currentIndex ?? 0].tag.title;
         // String artist = player.sequence![player.currentIndex ?? 0].tag.artist;
-        QueryArtworkWidget artwork = player.sequence![player.currentIndex ?? 0].tag.artwork;
-        final appController = Get.find<AppController>();
-        Uint8List? listData = await appController.getSongImage(artwork.id);
-        final Directory tempDir = await getTemporaryDirectory();
-        File file = await File('${tempDir.path}/${artwork.id}.png').create();
-        if(listData != null){
-          await file.writeAsBytes(listData);
-        }
-        else{
-          final ByteData bytes = await rootBundle.load('assets/images/gd.png');
-          final Uint8List listBytes = bytes.buffer.asUint8List();
-          await file.writeAsBytes(listBytes);
-        }
         if(stream2 != null){
           await stream2!.cancel();
         }
