@@ -38,100 +38,99 @@ class SimilarController extends GetxController {
   String clientSecret = 'd4bcd0cd828943cfa8912ccaa89bc88d';
 
   String? token;
-  setToken(String? value){
+  setToken(String? value) {
     token = value;
     update();
   }
 
   List? similarSongs;
-  setSimilarSongs(List? value){
+  setSimilarSongs(List? value) {
     similarSongs = value;
     update();
   }
 
-  Future<int> getToken() async{
-    try{
-      final response = await http.post(
-          Uri.parse("https://accounts.spotify.com/api/token"),
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: {
-            "grant_type": "client_credentials",
-            "client_id": clientId,
-            "client_secret": clientSecret
-          }
-      );
+  Future<int> getToken() async {
+    try {
+      final response = await http
+          .post(Uri.parse("https://accounts.spotify.com/api/token"), headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      }, body: {
+        "grant_type": "client_credentials",
+        "client_id": clientId,
+        "client_secret": clientSecret
+      });
+      print('spotify response: ${response.statusCode}');
       Map data = json.decode(response.body);
+      print('spotify token data: $data');
       String token = data['access_token'] ?? '';
       String type = data['token_type'] ?? '';
-      String finalToken = token.isNotEmpty && type.isNotEmpty ? '$type $token' : '';
+      String finalToken =
+          token.isNotEmpty && type.isNotEmpty ? '$type $token' : '';
       // print('spotifyToken = $finalToken');
       setToken(finalToken);
       return response.statusCode;
-    }
-    catch(e){
+    } catch (e) {
+      print('spotify catch: $e');
       setToken(null);
       return 0;
     }
   }
 
-  Future<String> getTrackId({required String title, required String artist}) async{
-    try{
-      final response = await http.get(Uri.parse('https://api.spotify.com/v1/search?q=track:$title artist:$artist&type=track'),
+  Future<String> getTrackId(
+      {required String title, required String artist}) async {
+    try {
+      final response = await http.get(
+          Uri.parse(
+              'https://api.spotify.com/v1/search?q=track:$title artist:$artist&type=track'),
           headers: {
             'Authorization': token ?? '',
-          }
-      );
-      if(response.statusCode == 401){
+          });
+      if (response.statusCode == 401) {
         await getToken();
         String retryId = await getTrackId(title: title, artist: artist);
         return retryId;
-      }
-      else{
+      } else {
         Map data = json.decode(response.body);
         Map tracks = data['tracks'] ?? {};
         List items = tracks['items'] ?? [];
-        if(items.isNotEmpty){
+        if (items.isNotEmpty) {
           Map track = items[0];
           String id = track['id'].toString() ?? '';
           return id;
-        }
-        else{
+        } else {
           return '';
         }
       }
-    }
-        catch(e){
+    } catch (e) {
       return '';
-        }
+    }
   }
 
   String? currentProgress;
 
   getSimilarTracks({required String title, required String artist}) async {
-    if(title != 'Unknown' || artist != 'Unknown'){
-      if(title != currentProgress){
+    if (title != 'Unknown' || artist != 'Unknown') {
+      if (title != currentProgress) {
         currentProgress = title;
         setSimilarSongs(null);
         if (token != null) {
-          String trackId = await getTrackId(
-              title: title, artist: artist);
+          print('spotify token not null');
+          String trackId = await getTrackId(title: title, artist: artist);
           if (trackId.isNotEmpty) {
-            final response = await http.get(Uri.parse(
-                'https://api.spotify.com/v1/recommendations?seed_tracks=$trackId'),
+            final response = await http.get(
+                Uri.parse(
+                    'https://api.spotify.com/v1/recommendations?seed_tracks=$trackId'),
                 headers: {
                   'Authorization': token ?? '',
-                }
-            );
+                });
+            print('spotify response: ${response.statusCode}');
             Map data = json.decode(response.body);
             List tracks = data['tracks'] ?? [];
             setSimilarSongs(tracks);
           }
-        }
-        else{
+        } else {
           int status = await getToken();
-          if(status == 200){
+          if (status == 200) {
             getSimilarTracks(title: title, artist: artist);
           }
         }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:on_audio_query_forked/on_audio_query.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class ShowSongControls extends StatelessWidget {
@@ -17,8 +17,7 @@ class ShowSongControls extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [Colors.black, Colors.transparent],
-          ).createShader(
-              Rect.fromLTRB(0, 0, rect.width, rect.height));
+          ).createShader(Rect.fromLTRB(0, 0, rect.width, rect.height));
         },
         blendMode: BlendMode.dstIn,
         child: artwork,

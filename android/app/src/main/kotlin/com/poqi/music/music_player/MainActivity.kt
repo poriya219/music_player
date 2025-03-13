@@ -1,4 +1,4 @@
-package com.poqi.music.music_player
+package com.poqi.music.MusicFlow
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_audio_background/just_audio_background.dart';
-import 'package:music_player/constans.dart';
-import 'package:music_player/pages/home_screen/home_screen.dart';
+import 'package:MusicFlow/constans.dart';
+import 'package:MusicFlow/pages/home_screen/home_screen.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import 'bindings.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await JustAudioBackground.init(
     androidNotificationChannelId: 'play_channel_group',
@@ -41,13 +41,19 @@ class MyApp extends StatelessWidget {
             surface: kBackBlackColor,
             surfaceTint: kBackBlackColor,
           ),
+          drawerTheme: DrawerThemeData(
+            backgroundColor: kBackBlackColor, // رنگ دلخواه
+          ),
+          cardTheme: CardTheme(
+            color: kBackBlackColor,
+          ),
           useMaterial3: true,
         ),
         theme: ThemeData(
           textTheme: Theme.of(context).textTheme.apply(
-            bodyColor: kBackBlackColor, //<-- SEE HERE
-            displayColor: Colors.pinkAccent, //<-- SEE HERE
-          ),
+                bodyColor: kBackBlackColor, //<-- SEE HERE
+                displayColor: Colors.pinkAccent, //<-- SEE HERE
+              ),
           primaryColor: kTextGreyColor,
           primaryColorLight: Colors.white,
           iconTheme: IconThemeData(color: kBackBlackColor),
@@ -56,6 +62,12 @@ class MyApp extends StatelessWidget {
             secondary: kTextGreyColor,
             surface: Colors.white,
             surfaceTint: Colors.white,
+          ),
+          drawerTheme: const DrawerThemeData(
+            backgroundColor: Colors.white, // رنگ دلخواه
+          ),
+          cardTheme: const CardTheme(
+            color: Colors.white,
           ),
           useMaterial3: true,
         ),

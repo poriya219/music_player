@@ -5,10 +5,10 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:music_player/controllers/app_controller.dart';
-import 'package:music_player/controllers/player_controller.dart';
-import 'package:music_player/pages/home_screen/controller/home_controller.dart';
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:MusicFlow/controllers/app_controller.dart';
+import 'package:MusicFlow/controllers/player_controller.dart';
+import 'package:MusicFlow/pages/home_screen/controller/home_controller.dart';
+import 'package:on_audio_query_forked/on_audio_query.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -28,7 +28,7 @@ class SongsList extends StatelessWidget {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 2.w,vertical: 1.h),
+          padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 1.h),
           child: Row(
             children: [
               GestureDetector(
@@ -38,8 +38,8 @@ class SongsList extends StatelessWidget {
                   int index = random.nextInt(songs.length - 1);
                   playerController.player.setShuffleModeEnabled(true);
                   // playerController.initialPlay(path: song.data);
-                  Get.to(()=> PlaySongScreen());
-                  playerController.sourceListGetter(list: songs,index: index);
+                  Get.to(() => PlaySongScreen());
+                  playerController.sourceListGetter(list: songs, index: index);
                 },
                 child: Container(
                   padding: EdgeInsets.all(3),
@@ -49,9 +49,7 @@ class SongsList extends StatelessWidget {
                   ),
                   child: Icon(
                     Icons.play_arrow,
-                    color: Theme.of(context)
-                        .iconTheme
-                        .color,
+                    color: Theme.of(context).iconTheme.color,
                     size: 6.w,
                   ),
                 ),
@@ -62,11 +60,11 @@ class SongsList extends StatelessWidget {
               const Text('Shuffle playback'),
               const Spacer(),
               GestureDetector(
-                onTap: () async{
+                onTap: () async {
                   final prefs = await SharedPreferences.getInstance();
                   bool isDark = prefs.getBool('isDark') ?? true;
                   Get.bottomSheet(
-                    GetBuilder<SongsListController>(builder: (slController){
+                    GetBuilder<SongsListController>(builder: (slController) {
                       return Container(
                         width: 90.w,
                         margin: EdgeInsets.symmetric(vertical: 3.h),
@@ -79,15 +77,22 @@ class SongsList extends StatelessWidget {
                           children: [
                             Padding(
                               padding: EdgeInsets.symmetric(vertical: 3.h),
-                              child: Text('Sort songs',
+                              child: Text(
+                                'Sort songs',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 17.sp,
                                 ),
                               ),
                             ),
-                            sortCard(title: 'By adding time',value: 0,isDark: isDark),
-                            sortCard(title: 'By the numbers of times played',value: 1, isDark: isDark),
+                            sortCard(
+                                title: 'By adding time',
+                                value: 0,
+                                isDark: isDark),
+                            sortCard(
+                                title: 'By the numbers of times played',
+                                value: 1,
+                                isDark: isDark),
                             SizedBox(
                               height: 3.h,
                             ),
@@ -98,111 +103,125 @@ class SongsList extends StatelessWidget {
                   );
                 },
                 child: const RotatedBox(
-                    quarterTurns: 3,
-                    child: Icon(EvaIcons.swapOutline)),
+                    quarterTurns: 3, child: Icon(EvaIcons.swapOutline)),
               ),
             ],
           ),
         ),
-        GetBuilder<SongsListController>(builder: (slController){
+        GetBuilder<SongsListController>(builder: (slController) {
           return Expanded(
-            child: FutureBuilder(future: songsListController.sortSongList(songs, songsListController.sortValue), builder: (context,AsyncSnapshot snapshot){
-              if(snapshot.hasData && snapshot.connectionState == ConnectionState.done){
-                List<SongModel> list = snapshot.data;
-                return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: list.length,
-                    itemBuilder: (context,index){
-                      SongModel song = list[index];
-                      return songsCard(list,song,index);
-                    });
-              }
-              else{
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-            }),
+            child: FutureBuilder(
+                future: songsListController.sortSongList(
+                    songs, songsListController.sortValue),
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (snapshot.hasData &&
+                      snapshot.connectionState == ConnectionState.done) {
+                    List<SongModel> list = snapshot.data;
+                    return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: list.length,
+                        itemBuilder: (context, index) {
+                          SongModel song = list[index];
+                          return songsCard(list, song, index);
+                        });
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                }),
           );
         }),
       ],
     );
   }
 
-  Widget sortCard({required String title, required int value, required bool isDark}){
+  Widget sortCard(
+      {required String title, required int value, required bool isDark}) {
     return GestureDetector(
-      onTap: () async{
+      onTap: () async {
         final prefs = await SharedPreferences.getInstance();
         prefs.setInt('SongSortValue', value);
         songsListController.setSortValue(value);
       },
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 3.h,horizontal: 3.w),
+        padding: EdgeInsets.symmetric(vertical: 3.h, horizontal: 3.w),
         width: 90.w,
         decoration: BoxDecoration(
-          color: songsListController.sortValue == value ? kBlueColor.withOpacity(0.3) : Colors.transparent,
+          color: songsListController.sortValue == value
+              ? kBlueColor.withOpacity(0.3)
+              : Colors.transparent,
         ),
-        child: Text(title,style: TextStyle(
-          color: songsListController.sortValue == value ? kBlueColor : (isDark ? Colors.white : kGreyColor),
-        ),),
+        child: Text(
+          title,
+          style: TextStyle(
+            color: songsListController.sortValue == value
+                ? kBlueColor
+                : (isDark ? Colors.white : kGreyColor),
+          ),
+        ),
       ),
     );
   }
 
-  Widget songsCard(List<SongModel> songsList, SongModel song,int index){
+  Widget songsCard(List<SongModel> songsList, SongModel song, int index) {
     return GestureDetector(
-      onTap: () async{
+      onTap: () async {
         final playerController = Get.put(PlayerController());
-          // playerController.initialPlay(path: song.data);
+        // playerController.initialPlay(path: song.data);
         print('index: $index');
-        await playerController.sourceListGetter(list: songsList,index: index);
-        Get.to(()=> PlaySongScreen());
+        await playerController.sourceListGetter(list: songsList, index: index);
+        Get.to(() => PlaySongScreen());
       },
       child: Container(
         width: 90.w,
         height: 7.h,
         color: Colors.transparent,
-        margin: EdgeInsets.symmetric(vertical: 1.h,horizontal: 5.w),
+        margin: EdgeInsets.symmetric(vertical: 1.h, horizontal: 5.w),
         child: Row(
           children: [
             SizedBox(
               width: 6.h,
               height: 6.h,
-              child: FutureBuilder(future: controller.getSongImage(song.id), builder: (context, AsyncSnapshot snapshot){
-                if(snapshot.connectionState == ConnectionState.done && snapshot.hasData){
-                  Uint8List? data = snapshot.data;
-                  if(data != null){
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: Image.memory(data,
-                        width: 6.h,
-                        height: 6.h,
-                        fit: BoxFit.cover,
-                      ),
-                    );
-                  }
-                  else{
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: Image.asset('assets/images/bd.png',
-                        width: 6.h,
-                        height: 6.h,
-                        fit: BoxFit.cover,
-                      ),
-                    );
-                  }
-                }
-                else{
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Image.asset('assets/images/gd.png',
-                      width: 6.h,
-                      height: 6.h,
-                      fit: BoxFit.cover,
-                    ),
-                  );
-                }
-              }),
+              child: FutureBuilder(
+                  future: controller.getSongImage(song.id),
+                  builder: (context, AsyncSnapshot snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done &&
+                        snapshot.hasData) {
+                      Uint8List? data = snapshot.data;
+                      if (data != null) {
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(15),
+                          child: Image.memory(
+                            data,
+                            width: 6.h,
+                            height: 6.h,
+                            fit: BoxFit.cover,
+                          ),
+                        );
+                      } else {
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(15),
+                          child: Image.asset(
+                            'assets/images/bd.png',
+                            width: 6.h,
+                            height: 6.h,
+                            fit: BoxFit.cover,
+                          ),
+                        );
+                      }
+                    } else {
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: Image.asset(
+                          'assets/images/gd.png',
+                          width: 6.h,
+                          height: 6.h,
+                          fit: BoxFit.cover,
+                        ),
+                      );
+                    }
+                  }),
             ),
             SizedBox(
               width: 5.w,
@@ -211,80 +230,96 @@ class SongsList extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: Text(song.title,overflow: TextOverflow.ellipsis,)),
-                  Expanded(child: Text(song.artist ?? '<unknown>',overflow: TextOverflow.ellipsis,style: TextStyle(color: kTextGreyColor),)),
+                  Expanded(
+                      child: Text(
+                    song.title,
+                    overflow: TextOverflow.ellipsis,
+                  )),
+                  Expanded(
+                      child: Text(
+                    song.artist ?? '<unknown>',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: kTextGreyColor),
+                  )),
                 ],
               ),
             ),
             SizedBox(
               width: 5.w,
             ),
-            Text(controller.durationGenerator(song.duration ?? 0),style: TextStyle(color: kTextGreyColor),),
+            Text(
+              controller.durationGenerator(song.duration ?? 0),
+              style: TextStyle(color: kTextGreyColor),
+            ),
             SizedBox(
               width: 3.w,
             ),
             DropdownButtonHideUnderline(
-          child: DropdownButton2(
-            customButton: Icon(
-              Icons.more_vert,
-              size: 6.w,
-              // color: Colors.red,
-            ),
-            items: const [
-              DropdownMenuItem(
-                value: 0,
-                child: Text('Add to playlist'),
+              child: DropdownButton2(
+                customButton: Icon(
+                  Icons.more_vert,
+                  size: 6.w,
+                  // color: Colors.red,
+                ),
+                items: const [
+                  DropdownMenuItem(
+                    value: 0,
+                    child: Text('Add to playlist'),
+                  ),
+                ],
+                onChanged: (value) {
+                  switch (value) {
+                    case 0:
+                      final homeController = Get.find<HomeController>();
+                      kShowDialog(
+                          verticalPadding: 30.h,
+                          child: ListView.builder(
+                            itemCount: homeController.playLists.length,
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              PlaylistModel playlist =
+                                  homeController.playLists[index];
+                              return Card(
+                                child: InkWell(
+                                  onTap: () {
+                                    print(playlist.id);
+                                    print(song.id);
+                                    kAddToPlaylist(
+                                        playlistId: playlist.id,
+                                        audioId: song.id);
+                                  },
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 5.w, vertical: 1.5.h),
+                                    child: Text(
+                                      playlist.playlist,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ));
+                  }
+                },
+                dropdownStyleData: DropdownStyleData(
+                  width: 50.w,
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4),
+                    // color: Colors.redAccent,
+                  ),
+                  offset: const Offset(0, 8),
+                ),
+                menuItemStyleData: MenuItemStyleData(
+                  // customHeights: [
+                  //   ...List<double>.filled(MenuItems.firstItems.length, 48),
+                  //   8,
+                  //   ...List<double>.filled(MenuItems.secondItems.length, 48),
+                  // ],
+                  padding: const EdgeInsets.only(left: 16, right: 16),
+                ),
               ),
-            ],
-            onChanged: (value) {
-              switch(value){
-                case 0:
-                  final homeController = Get.find<HomeController>();
-                  kShowDialog(
-                      verticalPadding: 30.h,
-                      child: ListView.builder(
-                    itemCount: homeController.playLists.length,
-                    shrinkWrap: true,
-                    itemBuilder: (context,index){
-                      PlaylistModel playlist = homeController.playLists[index];
-                      return Card(
-                        child: InkWell(
-                          onTap: (){
-                            print(playlist.id);
-                            print(song.id);
-                            kAddToPlaylist(playlistId: playlist.id, audioId: song.id);
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 5.w,vertical: 1.5.h),
-                            child: Text(
-                              playlist.playlist,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ));
-              }
-            },
-            dropdownStyleData: DropdownStyleData(
-              width: 50.w,
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(4),
-                // color: Colors.redAccent,
-              ),
-              offset: const Offset(0, 8),
             ),
-            menuItemStyleData: MenuItemStyleData(
-              // customHeights: [
-              //   ...List<double>.filled(MenuItems.firstItems.length, 48),
-              //   8,
-              //   ...List<double>.filled(MenuItems.secondItems.length, 48),
-              // ],
-              padding: const EdgeInsets.only(left: 16, right: 16),
-            ),
-          ),
-        ),
           ],
         ),
       ),

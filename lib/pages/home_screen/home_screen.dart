@@ -6,17 +6,17 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:music_player/constans.dart';
-import 'package:music_player/controllers/app_controller.dart';
-import 'package:music_player/controllers/player_controller.dart';
-import 'package:music_player/pages/home_screen/widgets/albums_list.dart';
-import 'package:music_player/pages/home_screen/widgets/artists_list.dart';
-import 'package:music_player/pages/home_screen/widgets/genres_list.dart';
-import 'package:music_player/pages/home_screen/widgets/list_detail.dart';
-import 'package:music_player/pages/home_screen/widgets/playlists.dart';
-import 'package:music_player/pages/home_screen/widgets/songs_list.dart';
-import 'package:music_player/pages/search_screen/search_screen.dart';
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:MusicFlow/constans.dart';
+import 'package:MusicFlow/controllers/app_controller.dart';
+import 'package:MusicFlow/controllers/player_controller.dart';
+import 'package:MusicFlow/pages/home_screen/widgets/albums_list.dart';
+import 'package:MusicFlow/pages/home_screen/widgets/artists_list.dart';
+import 'package:MusicFlow/pages/home_screen/widgets/genres_list.dart';
+import 'package:MusicFlow/pages/home_screen/widgets/list_detail.dart';
+import 'package:MusicFlow/pages/home_screen/widgets/playlists.dart';
+import 'package:MusicFlow/pages/home_screen/widgets/songs_list.dart';
+import 'package:MusicFlow/pages/search_screen/search_screen.dart';
+import 'package:on_audio_query_forked/on_audio_query.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:widget_slider/widget_slider.dart';
@@ -36,125 +36,148 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<HomeController>(builder: (hController){
+    return GetBuilder<HomeController>(builder: (hController) {
       return Scaffold(
         key: _key,
-        floatingActionButton: hController.selectedFilter == 'Playlist' ? FloatingActionButton(
-          onPressed: (){
-            TextEditingController textEditingController = TextEditingController();
-            kShowDialog(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    const Text('New Playlist'),
-                    TextField(
-                      controller: textEditingController,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+        floatingActionButton: hController.selectedFilter == 'Playlist'
+            ? FloatingActionButton(
+                onPressed: () {
+                  TextEditingController textEditingController =
+                      TextEditingController();
+                  kShowDialog(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        TextButton(onPressed: (){
-                          Get.back();
-                        }, child: const Text('Cancel')),
-                        TextButton(onPressed: () async{
-                          try{
-                            final OnAudioQuery audioQuery = OnAudioQuery();
-                            bool status = await audioQuery.createPlaylist(textEditingController.text);
-                            if(status){
-                              kShowToast('Playlist Created');
-                              Get.back();
-                              hController.resetPlaylists();
-                            }
-                            else{
-                              kShowToast('error');
-                              Get.back();
-                            }
-                          }
-                              catch(e){
-                            kShowToast('error');
-                            Get.back();
-                              }
-                        }, child: const Text('Create')),
+                        const Text('New Playlist'),
+                        TextField(
+                          controller: textEditingController,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                                onPressed: () {
+                                  Get.back();
+                                },
+                                child: const Text('Cancel')),
+                            TextButton(
+                                onPressed: () async {
+                                  try {
+                                    final OnAudioQuery audioQuery =
+                                        OnAudioQuery();
+                                    bool status =
+                                        await audioQuery.createPlaylist(
+                                            textEditingController.text);
+                                    if (status) {
+                                      kShowToast('Playlist Created');
+                                      Get.back();
+                                      hController.resetPlaylists();
+                                    } else {
+                                      kShowToast('error');
+                                      Get.back();
+                                    }
+                                  } catch (e) {
+                                    kShowToast('error');
+                                    Get.back();
+                                  }
+                                },
+                                child: const Text('Create')),
+                          ],
+                        ),
                       ],
                     ),
-                  ],
-                ),
-                verticalPadding: 35.h,
-            );
-          },
-          backgroundColor: kBlueColor,
-          child: const Icon(Icons.add),
-        ) : null,
+                    verticalPadding: 35.h,
+                  );
+                },
+                backgroundColor: kBlueColor,
+                child: const Icon(Icons.add),
+              )
+            : null,
         drawer: Drawer(
           child: SafeArea(
-            child: GetBuilder<AppController>(builder: (aController){
+            child: GetBuilder<AppController>(builder: (aController) {
               return Padding(
-                padding: EdgeInsets.symmetric(horizontal: 5.w,vertical: 2.h),
+                padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    drawerButton(title: 'Liked Songs', onTap: () async{
-                      Get.back();
-                      final prefs = await SharedPreferences.getInstance();
-                      List<String> likedSongs = prefs.getStringList('LikedSongs') ?? <String>[];
-                      List<SongModel> songs = [];
-                      for(SongModel song in hController.songs){
-                        QueryArtworkWidget a = QueryArtworkWidget(
-                            artworkBorder: BorderRadius.circular(20),
-                            artworkQuality: FilterQuality.high,
-                            size: 5000,
-                            quality: 100,
-                            format: ArtworkFormat.JPEG,
-                            id: song.id, type: ArtworkType.AUDIO);
-                        if(likedSongs.contains(a.id.toString())){
-                          songs.add(song);
-                        }
-                      }
-                      Get.to(()=> ListDetail(model: songs,mode: ListDetailMode.song,));
-                    }),
+                    drawerButton(
+                        title: 'Liked Songs',
+                        onTap: () async {
+                          Get.back();
+                          final prefs = await SharedPreferences.getInstance();
+                          List<String> likedSongs =
+                              prefs.getStringList('LikedSongs') ?? <String>[];
+                          List<SongModel> songs = [];
+                          for (SongModel song in hController.songs) {
+                            QueryArtworkWidget a = QueryArtworkWidget(
+                                artworkBorder: BorderRadius.circular(20),
+                                artworkQuality: FilterQuality.high,
+                                size: 5000,
+                                quality: 100,
+                                format: ArtworkFormat.JPEG,
+                                id: song.id,
+                                type: ArtworkType.AUDIO);
+                            if (likedSongs.contains(a.id.toString())) {
+                              songs.add(song);
+                            }
+                          }
+                          Get.to(() => ListDetail(
+                                model: songs,
+                                mode: ListDetailMode.song,
+                              ));
+                        }),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Theme mode:',
+                        Text(
+                          'Theme mode:',
                           style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16.sp
-                          ),
+                              fontWeight: FontWeight.w500, fontSize: 16.sp),
                         ),
                         AnimatedToggleSwitch<int>.rolling(
                           current: appController.themeValue,
                           values: const [0, 1],
-                          onChanged: (value) async{
+                          onChanged: (value) async {
                             final prefs = await SharedPreferences.getInstance();
                             appController.setThemeValue(value);
                             Timer(const Duration(milliseconds: 500), () {
-                              Get.changeThemeMode(
-                                  value == 0 ? ThemeMode.light : ThemeMode.dark);
-                              prefs.setBool('isDark', value == 0 ? false : true);
+                              Get.changeThemeMode(value == 0
+                                  ? ThemeMode.light
+                                  : ThemeMode.dark);
+                              prefs.setBool(
+                                  'isDark', value == 0 ? false : true);
                             });
                           },
-                          iconBuilder: (int value,size,boolVale){
-                            switch(value){
+                          iconBuilder: (int value, boolVale) {
+                            switch (value) {
                               case 0:
-                                return Icon(Icons.sunny,
+                                return Icon(
+                                  Icons.sunny,
                                   color: boolVale ? Colors.yellow : null,
                                 );
                               case 1:
-                                return Icon(EvaIcons.moon,
+                                return Icon(
+                                  EvaIcons.moon,
                                   color: boolVale ? Colors.cyan : null,
                                 );
                               default:
                                 return const SizedBox();
                             }
                           },
-                          colorBuilder: (int value){
-                            switch(value){
+                          styleBuilder: (int value) {
+                            switch (value) {
                               case 0:
-                                return Colors.cyan;
+                                return const ToggleStyle(
+                                  indicatorColor: Colors.cyan,
+                                );
                               case 1:
-                                return Colors.indigo;
+                                return const ToggleStyle(
+                                  indicatorColor: Colors.indigo,
+                                );
                               default:
-                                return Colors.white;
+                                return const ToggleStyle(
+                                    indicatorColor: Colors.white);
                             }
                           },
                         ),
@@ -162,11 +185,10 @@ class HomeScreen extends StatelessWidget {
                     ),
                     const Spacer(),
                     Center(
-                      child: Text('${appController.appName} ${appController.version}',
+                      child: Text(
+                        '${appController.appName} ${appController.version}',
                         style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w500
-                        ),
+                            fontSize: 14.sp, fontWeight: FontWeight.w500),
                       ),
                     ),
                   ],
@@ -179,7 +201,7 @@ class HomeScreen extends StatelessWidget {
           actions: [
             IconButton(
                 onPressed: () {
-                  Get.to(()=> SearchScreen());
+                  Get.to(() => SearchScreen());
                 },
                 icon: Icon(
                   EvaIcons.search,
@@ -204,48 +226,49 @@ class HomeScreen extends StatelessWidget {
                   builder: (context, AsyncSnapshot iSnapshot) {
                     int cIndex = iSnapshot.data ?? 0;
                     return StreamBuilder(
-                        stream:
-                        playerController.player.sequenceStream,
+                        stream: playerController.player.sequenceStream,
                         builder: (context, AsyncSnapshot snapshot) {
                           List<IndexedAudioSource> list =
-                              snapshot.data ??
-                                  <IndexedAudioSource>[];
-                          QueryArtworkWidget artwork = list.isEmpty ? const QueryArtworkWidget(id: 0, type: ArtworkType.AUDIO) :
-                          QueryArtworkWidget(
-                              artworkBorder: BorderRadius.circular(20),
-                              artworkQuality: FilterQuality.high,
-                              size: 5000,
-                              quality: 100,
-                              format: ArtworkFormat.JPEG,
-                              id: int.parse(list[cIndex].tag.id), type: ArtworkType.AUDIO);
-                          String songTitle = list.isEmpty ? 'Unknown' : list[cIndex].tag.title;
-                          String songArtist =
-                          list.isEmpty ? 'Unknown' : list[cIndex].tag.artist;
+                              snapshot.data ?? <IndexedAudioSource>[];
+                          QueryArtworkWidget artwork = list.isEmpty
+                              ? const QueryArtworkWidget(
+                                  id: 0, type: ArtworkType.AUDIO)
+                              : QueryArtworkWidget(
+                                  artworkBorder: BorderRadius.circular(20),
+                                  artworkQuality: FilterQuality.high,
+                                  size: 5000,
+                                  quality: 100,
+                                  format: ArtworkFormat.JPEG,
+                                  id: int.parse(list[cIndex].tag.id),
+                                  type: ArtworkType.AUDIO);
+                          String songTitle =
+                              list.isEmpty ? 'Unknown' : list[cIndex].tag.title;
+                          String songArtist = list.isEmpty
+                              ? 'Unknown'
+                              : list[cIndex].tag.artist;
                           return WidgetSlider(
-                            // itemCount: list.isEmpty ? 1 : list.length,
+                              // itemCount: list.isEmpty ? 1 : list.length,
                               itemCount: 3,
                               proximity: 1,
                               fixedSize: 9.h,
                               controller: appController.sliderController,
-                              onMove: (i){
-                                if(!appController.isSeeking){
+                              onMove: (i) {
+                                if (!appController.isSeeking) {
                                   print('current index: $i');
                                   print('current cIndex: $cIndex');
-                                  print('###################################set 1');
+                                  print(
+                                      '###################################set 1');
                                   appController.seekSliderController(1);
-                                  if(i == 2){
-                                    playerController.player
-                                        .seekToNext();
-                                  }
-                                  else if(i == 0){
-                                    playerController.player
-                                        .seekToPrevious();
+                                  if (i == 2) {
+                                    playerController.player.seekToNext();
+                                  } else if (i == 0) {
+                                    playerController.player.seekToPrevious();
                                   }
                                 }
                               },
                               transformCurve: const ElasticOutCurve(),
                               sizeDistinction: 0.99,
-                              itemBuilder: (context, index, activeIndex){
+                              itemBuilder: (context, index, activeIndex) {
                                 // appController.seekSliderController(cIndex);
                                 return GestureDetector(
                                   onTap: () {
@@ -262,78 +285,104 @@ class HomeScreen extends StatelessWidget {
                                           height: 7.h,
                                           child: Row(
                                             mainAxisAlignment:
-                                            MainAxisAlignment.end,
+                                                MainAxisAlignment.end,
                                             crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                                CrossAxisAlignment.start,
                                             children: [
                                               SizedBox(
                                                 width: 22.w,
                                               ),
                                               Expanded(
                                                   child: Column(
-                                                    crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .start,
-                                                    mainAxisAlignment:
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
                                                     MainAxisAlignment
                                                         .spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        songTitle,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: TextStyle(
-                                                          fontSize: 16.sp,
-                                                          fontWeight:
+                                                children: [
+                                                  Text(
+                                                    songTitle,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      fontSize: 16.sp,
+                                                      fontWeight:
                                                           FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        songArtist,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: TextStyle(
-                                                          fontSize: 16.sp,
-                                                          fontWeight:
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    songArtist,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      fontSize: 16.sp,
+                                                      fontWeight:
                                                           FontWeight.w500,
-                                                          color:
-                                                          kTextGreyColor,
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        height: 0.5.h,
-                                                      ),
-                                                    ],
-                                                  )),
+                                                      color: kTextGreyColor,
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 0.5.h,
+                                                  ),
+                                                ],
+                                              )),
                                               Stack(
                                                 alignment: Alignment.center,
                                                 children: [
-                                                  StreamBuilder(stream: playerController.player.durationStream, builder: (context,AsyncSnapshot dSnapshot){
-                                                    return StreamBuilder(stream: playerController.player.positionStream, builder: (context,AsyncSnapshot pSnapshot){
-                                                      if(pSnapshot.hasData && dSnapshot.hasData){
-                                                        Duration duration = dSnapshot.data ?? const Duration(seconds: 1);
-                                                        Duration position = pSnapshot.data ?? Duration.zero;
-                                                        return CircularProgressIndicator(
-                                                          value: position.inSeconds / duration.inSeconds,
-                                                          color: kBlueColor,
-                                                          strokeWidth: 3,
-                                                          backgroundColor: const Color(0xFFCCCCCC),
-                                                        );
-                                                      }
-                                                      else{
-                                                        return const SizedBox();
-                                                      }
-                                                    });
-                                                  }),
+                                                  StreamBuilder(
+                                                      stream: playerController
+                                                          .player
+                                                          .durationStream,
+                                                      builder: (context,
+                                                          AsyncSnapshot
+                                                              dSnapshot) {
+                                                        return StreamBuilder(
+                                                            stream: playerController
+                                                                .player
+                                                                .positionStream,
+                                                            builder: (context,
+                                                                AsyncSnapshot
+                                                                    pSnapshot) {
+                                                              if (pSnapshot
+                                                                      .hasData &&
+                                                                  dSnapshot
+                                                                      .hasData) {
+                                                                Duration duration = dSnapshot
+                                                                        .data ??
+                                                                    const Duration(
+                                                                        seconds:
+                                                                            1);
+                                                                Duration
+                                                                    position =
+                                                                    pSnapshot
+                                                                            .data ??
+                                                                        Duration
+                                                                            .zero;
+                                                                return CircularProgressIndicator(
+                                                                  value: position
+                                                                          .inSeconds /
+                                                                      duration
+                                                                          .inSeconds,
+                                                                  color:
+                                                                      kBlueColor,
+                                                                  strokeWidth:
+                                                                      3,
+                                                                  backgroundColor:
+                                                                      const Color(
+                                                                          0xFFCCCCCC),
+                                                                );
+                                                              } else {
+                                                                return const SizedBox();
+                                                              }
+                                                            });
+                                                      }),
                                                   GestureDetector(
                                                     onTap: () {
                                                       if (isPlaying) {
-                                                        playerController
-                                                            .player
+                                                        playerController.player
                                                             .stop();
                                                       } else {
-                                                        playerController
-                                                            .player
+                                                        playerController.player
                                                             .play();
                                                       }
                                                     },
@@ -372,39 +421,40 @@ class HomeScreen extends StatelessWidget {
                                         Positioned(
                                             left: 4.w,
                                             bottom: 2.h,
-                                            child: controller.isGrantedPermission ? FutureBuilder(
-                                                future: appController
-                                                    .getSongImage(
-                                                    artwork.id),
-                                                builder: (context,
-                                                    AsyncSnapshot
-                                                    fSnapshot) {
-                                                  if (fSnapshot.hasData &&
-                                                      fSnapshot
-                                                          .connectionState ==
-                                                          ConnectionState
-                                                              .done) {
-                                                    Uint8List data =
-                                                        fSnapshot.data;
-                                                    return CircleAvatar(
-                                                        radius: 7.w,
-                                                        foregroundColor:
-                                                        kBlueColor,
-                                                        backgroundColor:
-                                                        kBlueColor,
-                                                        foregroundImage:
-                                                        MemoryImage(
-                                                            data));
-                                                  } else {
-                                                    return SizedBox();
-                                                  }
-                                                }) : CircleAvatar(
-                                                radius: 7.w,
-                                                foregroundColor:
-                                                kBlueColor,
-                                                backgroundColor:
-                                                kBlueColor,
-                                                )),
+                                            child: controller
+                                                    .isGrantedPermission
+                                                ? FutureBuilder(
+                                                    future: appController
+                                                        .getSongImage(
+                                                            artwork.id),
+                                                    builder: (context,
+                                                        AsyncSnapshot
+                                                            fSnapshot) {
+                                                      if (fSnapshot.hasData &&
+                                                          fSnapshot
+                                                                  .connectionState ==
+                                                              ConnectionState
+                                                                  .done) {
+                                                        Uint8List data =
+                                                            fSnapshot.data;
+                                                        return CircleAvatar(
+                                                            radius: 7.w,
+                                                            foregroundColor:
+                                                                kBlueColor,
+                                                            backgroundColor:
+                                                                kBlueColor,
+                                                            foregroundImage:
+                                                                MemoryImage(
+                                                                    data));
+                                                      } else {
+                                                        return SizedBox();
+                                                      }
+                                                    })
+                                                : CircleAvatar(
+                                                    radius: 7.w,
+                                                    foregroundColor: kBlueColor,
+                                                    backgroundColor: kBlueColor,
+                                                  )),
                                       ],
                                     ),
                                   ),
@@ -436,8 +486,8 @@ class HomeScreen extends StatelessWidget {
                   transformCurve: const ElasticOutCurve(),
                   sizeDistinction: 0.99,
                   controller: sliderController,
-                  onMove: (i){
-                    switch(i){
+                  onMove: (i) {
+                    switch (i) {
                       case 0:
                         controller.setSelectedFilter('Song');
                         break;
@@ -455,18 +505,18 @@ class HomeScreen extends StatelessWidget {
                         break;
                     }
                   },
-                  itemBuilder: (context, index, activeIndex){
+                  itemBuilder: (context, index, activeIndex) {
                     return controller.selectedFilter == 'Song'
                         ? SongsList(songs: controller.songs)
                         : controller.selectedFilter == 'Playlist'
-                        ? Playlists(playlists: controller.playLists)
-                        : controller.selectedFilter == 'Artist'
-                        ? ArtistsList(artists: controller.artists)
-                        : controller.selectedFilter == 'Album'
-                        ? AlbumsList(albums: controller.albums)
-                        : controller.selectedFilter == 'Genre'
-                        ? GenresList(genres: controller.genres)
-                        : SizedBox();
+                            ? Playlists(playlists: controller.playLists)
+                            : controller.selectedFilter == 'Artist'
+                                ? ArtistsList(artists: controller.artists)
+                                : controller.selectedFilter == 'Album'
+                                    ? AlbumsList(albums: controller.albums)
+                                    : controller.selectedFilter == 'Genre'
+                                        ? GenresList(genres: controller.genres)
+                                        : SizedBox();
                   },
                 ),
               ),
@@ -477,21 +527,23 @@ class HomeScreen extends StatelessWidget {
     });
   }
 
-  Widget drawerButton({required String title, required Function onTap}){
+  Widget drawerButton({required String title, required Function onTap}) {
     return InkWell(
-      onTap: ()=> onTap(),
+      onTap: () => onTap(),
       child: Container(
         color: Colors.transparent,
-        padding: EdgeInsets.symmetric(vertical: 1.h),
-        child: Card(
-          child: Text(title,style: TextStyle(fontWeight: FontWeight.w500,fontSize: 16.sp),),
+        padding: EdgeInsets.symmetric(vertical: 2.h),
+        width: 65.w,
+        child: Text(
+          title,
+          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16.sp),
         ),
       ),
     );
   }
 
-  int sliderIndexGetter(String title){
-    switch(title){
+  int sliderIndexGetter(String title) {
+    switch (title) {
       case 'Song':
         return 0;
       case 'Playlist':

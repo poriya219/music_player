@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:music_player/constans.dart';
+import 'package:MusicFlow/constans.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -19,63 +19,69 @@ class SearchScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: GetBuilder<SearchScreenController>(builder: (sController){
+        child: GetBuilder<SearchScreenController>(builder: (sController) {
           return Padding(
             padding: EdgeInsets.symmetric(horizontal: 5.w),
             child: Column(
               children: [
-                Padding(padding: EdgeInsets.symmetric(vertical: 2.h),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: (){
-                        Get.back();
-                      },
-                      child: Icon(EvaIcons.arrowIosBack),
-                    ),
-                    Expanded(child: Container(
-                      height: 5.h,
-                      margin: EdgeInsets.only(left: 4.w),
-                        padding: EdgeInsets.symmetric(horizontal: 3.w),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFCCCCCC),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: TextField(
-                          controller: searchController.textEditingController,
-                          onChanged: (value){
-                            searchController.update();
-                            if(value.isNotEmpty){
-                              searchController.searchSongs();
-                            }
-                            else{
-                              searchController.setSearchedSongs([]);
-                            }
-                            Timer(const Duration(seconds: 5), () async{
-                              if(searchController.textEditingController.text.isNotEmpty && searchController.textEditingController.text == value){
-                                final prefs = await SharedPreferences.getInstance();
-                                List<String> history = prefs.getStringList('SearchHistory') ?? [];
-                                history.add(value);
-                                prefs.setStringList('SearchHistory', history);
-                              }
-                            });
-                          },
-                          decoration: InputDecoration(
-                            hintText: 'Search for songs on device',
-                            contentPadding: EdgeInsets.symmetric(vertical: 1.8.h),
-                            hintStyle: TextStyle(
-                              fontSize: 15.sp
-                            ),
-                            enabledBorder: const OutlineInputBorder(
-                                borderSide: BorderSide.none
-                            ),
-                            focusedBorder: const OutlineInputBorder(
-                              borderSide: BorderSide.none
-                            )
-                          ),
-                        ))),
-                  ],
-                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 2.h),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Get.back();
+                        },
+                        child: Icon(EvaIcons.arrowIosBack),
+                      ),
+                      Expanded(
+                          child: Container(
+                              height: 5.h,
+                              margin: EdgeInsets.only(left: 4.w),
+                              padding: EdgeInsets.symmetric(horizontal: 3.w),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFCCCCCC),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: TextField(
+                                controller:
+                                    searchController.textEditingController,
+                                onChanged: (value) {
+                                  searchController.update();
+                                  if (value.isNotEmpty) {
+                                    searchController.searchSongs();
+                                  } else {
+                                    searchController.setSearchedSongs([]);
+                                  }
+                                  Timer(const Duration(seconds: 5), () async {
+                                    if (searchController.textEditingController
+                                            .text.isNotEmpty &&
+                                        searchController
+                                                .textEditingController.text ==
+                                            value) {
+                                      final prefs =
+                                          await SharedPreferences.getInstance();
+                                      List<String> history = prefs
+                                              .getStringList('SearchHistory') ??
+                                          [];
+                                      history.add(value);
+                                      prefs.setStringList(
+                                          'SearchHistory', history);
+                                    }
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                    hintText: 'Search for songs on device',
+                                    contentPadding:
+                                        EdgeInsets.symmetric(vertical: 1.8.h),
+                                    hintStyle: TextStyle(fontSize: 15.sp),
+                                    enabledBorder: const OutlineInputBorder(
+                                        borderSide: BorderSide.none),
+                                    focusedBorder: const OutlineInputBorder(
+                                        borderSide: BorderSide.none)),
+                              ))),
+                    ],
+                  ),
                 ),
                 SizedBox(
                   height: 2.h,
@@ -85,14 +91,15 @@ class SearchScreen extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Search history',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17.sp,
-                      ),
+                      Text(
+                        'Search history',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 17.sp,
+                        ),
                       ),
                       GestureDetector(
-                        onTap: () async{
+                        onTap: () async {
                           final prefs = await SharedPreferences.getInstance();
                           prefs.setStringList('SearchHistory', []);
                           searchController.setHistory([]);
@@ -108,16 +115,20 @@ class SearchScreen extends StatelessWidget {
                       width: 90.w,
                       height: 6.h,
                       child: ListView.builder(
-                      itemCount: searchController.history.length,
-                      scrollDirection: Axis.horizontal,
-                      shrinkWrap: true,
-                      itemBuilder: (context,index){
-                        return historyContainer(title: searchController.history.reversed.toList()[index]);
-                      })),
+                          itemCount: searchController.history.length,
+                          scrollDirection: Axis.horizontal,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            return historyContainer(
+                                title: searchController.history.reversed
+                                    .toList()[index]);
+                          })),
                 ),
                 Visibility(
                     visible: searchController.searchedSongs.isNotEmpty,
-                    child: Expanded(child: SongsList(songs: searchController.searchedSongs))),
+                    child: Expanded(
+                        child:
+                            SongsList(songs: searchController.searchedSongs))),
               ],
             ),
           );

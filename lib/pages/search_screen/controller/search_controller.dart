@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:music_player/pages/home_screen/controller/home_controller.dart';
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:MusicFlow/pages/home_screen/controller/home_controller.dart';
+import 'package:on_audio_query_forked/on_audio_query.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchScreenController extends GetxController {
@@ -13,7 +13,7 @@ class SearchScreenController extends GetxController {
   }
 
   List<String> history = ['text1', 'text2'];
-  setHistory(List<String> value){
+  setHistory(List<String> value) {
     history = value;
     update();
   }
@@ -45,7 +45,7 @@ class SearchScreenController extends GetxController {
     super.onInit();
   }
 
-  getHistoryList() async{
+  getHistoryList() async {
     final prefs = await SharedPreferences.getInstance();
     List<String> hl = prefs.getStringList('SearchHistory') ?? [];
     setHistory(hl);

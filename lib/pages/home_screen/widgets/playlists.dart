@@ -1,9 +1,8 @@
 import 'dart:typed_data';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:on_audio_query_forked/on_audio_query.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../constans.dart';
@@ -22,8 +21,10 @@ class Playlists extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(top: 1.h),
       child: GridView.builder(
-        gridDelegate:
-            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,childAspectRatio: 9/10,),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 9 / 10,
+        ),
         itemCount: playlists.length,
         shrinkWrap: true,
         itemBuilder: (context, index) => playlistCard(
@@ -35,76 +36,82 @@ class Playlists extends StatelessWidget {
 
   Widget playlistCard({required PlaylistModel playlist}) {
     return GestureDetector(
-      onTap: (){
-        Get.to(()=> ListDetail(model: playlist,mode: ListDetailMode.playlist,));
-      },
-      onLongPress: (){
-        kShowDialog(
-            verticalPadding: 30.h,
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                Card(
-                  child: InkWell(
-                    onTap: () async{
-                      final OnAudioQuery audioQuery = OnAudioQuery();
-                      await audioQuery.removePlaylist(playlist.id);
-                      Get.back();
-                      kShowToast('Playlist Removed');
-                      final controller = Get.find<HomeController>();
-                      controller.resetPlaylists();
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 5.w,vertical: 1.5.h),
-                      child: const Text(
-                        'Remove Playlist',
-                      ),
-                    ),
-                  ),
-                )
-              ],
+      onTap: () {
+        Get.to(() => ListDetail(
+              model: playlist,
+              mode: ListDetailMode.playlist,
             ));
+      },
+      onLongPress: () {
+        // kShowDialog(
+        //     verticalPadding: 30.h,
+        //     child: ListView(
+        //       shrinkWrap: true,
+        //       children: [
+        //         InkWell(
+        //           onTap: () async {
+        //             final OnAudioQuery audioQuery = OnAudioQuery();
+        //             await audioQuery.removePlaylist(playlist.id);
+        //             Get.back();
+        //             kShowToast('Playlist Removed');
+        //             final controller = Get.find<HomeController>();
+        //             controller.resetPlaylists();
+        //           },
+        //           child: Padding(
+        //             padding:
+        //                 EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
+        //             child: const Text(
+        //               'Remove Playlist',
+        //             ),
+        //           ),
+        //         )
+        //       ],
+        //     ));
       },
       child: Column(
         children: [
           SizedBox(
             width: 40.w,
             height: 40.w,
-            child: FutureBuilder(future: controller.getPlaylistImage(playlist.id), builder: (context, AsyncSnapshot snapshot){
-              if(snapshot.connectionState == ConnectionState.done && snapshot.hasData){
-                Uint8List? data = snapshot.data;
-                if(data != null){
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Image.memory(data,
-                      width: 40.w,
-                      height: 40.w,
-                      fit: BoxFit.cover,
-                    ),
-                  );
-                }
-                else{
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Image.asset('assets/images/bd.png',
-                      width: 40.w,
-                      height: 40.w,
-                      fit: BoxFit.cover,
-                    ),
-                  );
-                }
-              }
-              else{
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Image.asset('assets/images/gd.png',
-                    width: 40.w,
-                    height: 40.w,
-                    fit: BoxFit.cover,
-                  ),
-                );
-              }
-            }),
+            child: FutureBuilder(
+                future: controller.getPlaylistImage(playlist.id),
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.hasData) {
+                    Uint8List? data = snapshot.data;
+                    if (data != null) {
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: Image.memory(
+                          data,
+                          width: 40.w,
+                          height: 40.w,
+                          fit: BoxFit.cover,
+                        ),
+                      );
+                    } else {
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: Image.asset(
+                          'assets/images/bd.png',
+                          width: 40.w,
+                          height: 40.w,
+                          fit: BoxFit.cover,
+                        ),
+                      );
+                    }
+                  } else {
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: Image.asset(
+                        'assets/images/gd.png',
+                        width: 40.w,
+                        height: 40.w,
+                        fit: BoxFit.cover,
+                      ),
+                    );
+                  }
+                }),
           ),
           SizedBox(
             height: 0.5.h,
@@ -114,14 +121,16 @@ class Playlists extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(playlist.playlist,
+                Text(
+                  playlist.playlist,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(
                   height: 0.2.h,
                 ),
-                Text('Total ${playlist.numOfSongs} songs',
+                Text(
+                  'Total ${playlist.numOfSongs} songs',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: kTextGreyColor),

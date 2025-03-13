@@ -1,6 +1,6 @@
 // import 'package:awesome_notifications/awesome_notifications.dart';
 // import 'package:get/get.dart';
-// import 'package:music_player/controllers/player_controller.dart';
+// import 'package:MusicFlow/controllers/player_controller.dart';
 //
 // class NotificationController {
 //

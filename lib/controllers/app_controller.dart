@@ -2,21 +2,20 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:get/get.dart';
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:on_audio_query_forked/on_audio_query.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:widget_slider/controller.dart';
 
-class AppController extends GetxController{
-
+class AppController extends GetxController {
   final SliderController sliderController = SliderController();
 
   bool isSeeking = false;
-  setIsSeeking(bool value){
+  setIsSeeking(bool value) {
     isSeeking = value;
     update();
   }
 
-  seekSliderController(int index){
+  seekSliderController(int index) {
     isSeeking = true;
     sliderController.moveTo!.call(index);
     update();
@@ -80,7 +79,7 @@ class AppController extends GetxController{
     return data;
   }
 
-  String durationGenerator(int duration){
+  String durationGenerator(int duration) {
     int allSeconds = duration ~/ 1000;
     int min = allSeconds ~/ 60;
     int second = allSeconds % 60;
@@ -93,7 +92,7 @@ class AppController extends GetxController{
     super.onInit();
   }
 
-  getAppInfo() async{
+  getAppInfo() async {
     print('get app info');
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     appName = packageInfo.appName;
@@ -106,8 +105,10 @@ class AppController extends GetxController{
   String appName = '';
   String version = '';
 
-  int themeValue = 1; /// 1 is darkMode and 0 is lightMode
-  setThemeValue(int value){
+  int themeValue = 1;
+
+  /// 1 is darkMode and 0 is lightMode
+  setThemeValue(int value) {
     themeValue = value;
     update();
   }

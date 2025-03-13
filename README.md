@@ -1,4 +1,4 @@
-# music_player
+# MusicFlow
 
 a powerful music player
 
