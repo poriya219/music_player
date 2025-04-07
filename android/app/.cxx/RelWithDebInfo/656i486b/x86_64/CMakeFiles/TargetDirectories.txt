@@ -1,2 +1,0 @@
-/home/pouria/StudioProjects/music_player/android/app/.cxx/RelWithDebInfo/656i486b/x86_64/CMakeFiles/edit_cache.dir
-/home/pouria/StudioProjects/music_player/android/app/.cxx/RelWithDebInfo/656i486b/x86_64/CMakeFiles/rebuild_cache.dir

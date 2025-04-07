@@ -1,1 +1,0 @@
-/home/pouria/StudioProjects/music_player/build/app/intermediates/cxx/RelWithDebInfo/656i486b/obj/armeabi-v7a

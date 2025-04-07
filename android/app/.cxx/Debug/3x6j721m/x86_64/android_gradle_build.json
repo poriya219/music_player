@@ -6,14 +6,14 @@
     [
       "/home/pouria/Android/Sdk/cmake/3.22.1/bin/ninja",
       "-C",
-      "/home/pouria/StudioProjects/MusicFlow/android/app/.cxx/Debug/3x6j721m/x86_64",
+      "/home/pouria/StudioProjects/music_player/android/app/.cxx/Debug/3x6j721m/x86_64",
       "clean"
     ]
   ],
   "buildTargetsCommandComponents": [
     "/home/pouria/Android/Sdk/cmake/3.22.1/bin/ninja",
     "-C",
-    "/home/pouria/StudioProjects/MusicFlow/android/app/.cxx/Debug/3x6j721m/x86_64",
+    "/home/pouria/StudioProjects/music_player/android/app/.cxx/Debug/3x6j721m/x86_64",
     "{LIST_OF_TARGETS_TO_BUILD}"
   ],
   "libraries": {},

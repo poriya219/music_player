@@ -151,7 +151,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/home/pouria/StudioProjects/MusicFlow/android/app/.cxx/Debug/3x6j721m/x86_64"
+			"value" : "/home/pouria/StudioProjects/music_player/android/app/.cxx/Debug/3x6j721m/x86_64"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -751,7 +751,7 @@
 				}
 			],
 			"type" : "UNINITIALIZED",
-			"value" : "/home/pouria/StudioProjects/MusicFlow/build/app/intermediates/cxx/Debug/3x6j721m/obj/x86_64"
+			"value" : "/home/pouria/StudioProjects/music_player/build/app/intermediates/cxx/Debug/3x6j721m/obj/x86_64"
 		},
 		{
 			"name" : "CMAKE_LINKER",
@@ -1023,7 +1023,7 @@
 				}
 			],
 			"type" : "UNINITIALIZED",
-			"value" : "/home/pouria/StudioProjects/MusicFlow/build/app/intermediates/cxx/Debug/3x6j721m/obj/x86_64"
+			"value" : "/home/pouria/StudioProjects/music_player/build/app/intermediates/cxx/Debug/3x6j721m/obj/x86_64"
 		},
 		{
 			"name" : "CMAKE_SHARED_LINKER_FLAGS",
@@ -1343,7 +1343,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/home/pouria/StudioProjects/MusicFlow/android/app/.cxx/Debug/3x6j721m/x86_64"
+			"value" : "/home/pouria/StudioProjects/music_player/android/app/.cxx/Debug/3x6j721m/x86_64"
 		},
 		{
 			"name" : "Project_IS_TOP_LEVEL",

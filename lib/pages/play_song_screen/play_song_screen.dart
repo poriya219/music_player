@@ -238,29 +238,21 @@ class PlaySongScreen extends StatelessWidget {
                                                             ? 0
                                                             : lyricsController
                                                                 .lyricsString!
-                                                                .split('\n')
                                                                 .length,
                                                         physics:
                                                             const NeverScrollableScrollPhysics(),
                                                         shrinkWrap: true,
                                                         itemBuilder:
                                                             (context, index) {
-                                                          List<String> stList =
-                                                              lyricsController
-                                                                          .lyricsString ==
-                                                                      null
-                                                                  ? <String>[]
-                                                                  : lyricsController
-                                                                      .lyricsString!
-                                                                      .split(
-                                                                          '\n');
                                                           return Padding(
                                                             padding: EdgeInsets
                                                                 .symmetric(
                                                                     vertical:
                                                                         1.h),
                                                             child: Text(
-                                                              stList[index],
+                                                              lyricsController
+                                                                      .lyricsString![
+                                                                  index],
                                                               textAlign:
                                                                   TextAlign
                                                                       .center,
