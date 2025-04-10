@@ -1,0 +1,41 @@
+group 'com.adivery.plugin'
+version '1.0'
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+        maven {
+            url 'https://dl.bintray.com/adivery/maven'
+        }
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.2.2'
+    }
+}
+
+repositories {
+    mavenCentral()
+    google()
+}
+
+apply plugin: 'com.android.library'
+
+
+android {
+    compileSdkVersion 31
+    namespace 'com.adivery.plugin'
+
+    defaultConfig {
+        minSdkVersion 16
+    }
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+}
+
+dependencies {
+    implementation 'com.adivery:sdk:4.6.1'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.21'
+}

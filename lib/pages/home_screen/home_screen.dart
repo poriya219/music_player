@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:MusicFlow/pages/find_screen/find_song_screen.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
@@ -200,13 +201,22 @@ class HomeScreen extends StatelessWidget {
         appBar: AppBar(
           actions: [
             IconButton(
+              onPressed: () {
+                Get.to(() => FindSongScreen());
+              },
+              icon: Icon(
+                EvaIcons.radioButtonOnOutline,
+                color: Theme.of(context).iconTheme.color,
+              ),
+            ),
+            IconButton(
                 onPressed: () {
                   Get.to(() => SearchScreen());
                 },
                 icon: Icon(
                   EvaIcons.search,
                   color: Theme.of(context).iconTheme.color,
-                ))
+                )),
           ],
           leading: IconButton(
               onPressed: () {
