@@ -37,6 +37,8 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Color? textColor =
+        (Get.theme.textTheme.bodyMedium ?? const TextStyle()).color;
     return GetBuilder<HomeController>(builder: (hController) {
       return Scaffold(
         key: _key,
@@ -49,7 +51,7 @@ class HomeScreen extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        const Text('New Playlist'),
+                        Text('t4'.tr),
                         TextField(
                           controller: textEditingController,
                         ),
@@ -60,7 +62,7 @@ class HomeScreen extends StatelessWidget {
                                 onPressed: () {
                                   Get.back();
                                 },
-                                child: const Text('Cancel')),
+                                child: Text('t5'.tr)),
                             TextButton(
                                 onPressed: () async {
                                   try {
@@ -82,7 +84,7 @@ class HomeScreen extends StatelessWidget {
                                     Get.back();
                                   }
                                 },
-                                child: const Text('Create')),
+                                child: Text('t6'.tr)),
                           ],
                         ),
                       ],
@@ -103,7 +105,7 @@ class HomeScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     drawerButton(
-                        title: 'Liked Songs',
+                        title: 't9'.tr,
                         onTap: () async {
                           Get.back();
                           final prefs = await SharedPreferences.getInstance();
@@ -128,11 +130,67 @@ class HomeScreen extends StatelessWidget {
                                 mode: ListDetailMode.song,
                               ));
                         }),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
+                    //     Text(
+                    //       "t7".tr,
+                    //       style: TextStyle(
+                    //           fontWeight: FontWeight.w500, fontSize: 16.sp),
+                    //     ),
+                    //     Row(
+                    //       mainAxisSize: MainAxisSize.min,
+                    //       children: [
+                    //         TextButton(
+                    //             onPressed: () async {
+                    //               await Get.updateLocale(const Locale('fa'));
+                    //               final prefs =
+                    //                   await SharedPreferences.getInstance();
+                    //               prefs.setString('locale', 'fa');
+                    //               appController.setSelectedLocale('fa');
+                    //             },
+                    //             child: Text(
+                    //               'فارسی',
+                    //               style: TextStyle(
+                    //                   color:
+                    //                       appController.selectedLocale == 'fa'
+                    //                           ? null
+                    //                           : textColor),
+                    //             )),
+                    //         SizedBox(
+                    //           height: 15,
+                    //           width: 2,
+                    //           child: VerticalDivider(
+                    //             color: kGreyColor,
+                    //             width: 15,
+                    //             thickness: 2,
+                    //           ),
+                    //         ),
+                    //         TextButton(
+                    //             onPressed: () async {
+                    //               await Get.updateLocale(const Locale('en'));
+                    //               final prefs =
+                    //                   await SharedPreferences.getInstance();
+                    //               prefs.setString('locale', 'en');
+                    //               appController.setSelectedLocale('en');
+                    //             },
+                    //             child: Text(
+                    //               'English',
+                    //               style: TextStyle(
+                    //                   color:
+                    //                       appController.selectedLocale == 'en'
+                    //                           ? null
+                    //                           : textColor),
+                    //             )),
+                    //       ],
+                    //     ),
+                    //   ],
+                    // ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Theme mode:',
+                          't8'.tr,
                           style: TextStyle(
                               fontWeight: FontWeight.w500, fontSize: 16.sp),
                         ),
@@ -240,6 +298,9 @@ class HomeScreen extends StatelessWidget {
                         builder: (context, AsyncSnapshot snapshot) {
                           List<IndexedAudioSource> list =
                               snapshot.data ?? <IndexedAudioSource>[];
+                          if (snapshot.data == null) {
+                            return const SizedBox();
+                          }
                           QueryArtworkWidget artwork = list.isEmpty
                               ? const QueryArtworkWidget(
                                   id: 0, type: ArtworkType.AUDIO)

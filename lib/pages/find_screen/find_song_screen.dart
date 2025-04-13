@@ -42,7 +42,7 @@ class FindSongScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Identify tracks',
+                          't1'.tr,
                           style: TextStyle(
                               fontSize: 18.sp, fontWeight: FontWeight.w500),
                         ),
@@ -52,7 +52,7 @@ class FindSongScreen extends StatelessWidget {
                         if (controller.music == null &&
                             controller.isActive == false) ...{
                           Text(
-                            'Push the button to start recognizing',
+                            't2'.tr,
                             style: TextStyle(
                               fontSize: 18.sp,
                               fontWeight: FontWeight.w500,
@@ -61,7 +61,7 @@ class FindSongScreen extends StatelessWidget {
                         },
                         if (controller.isActive == true) ...[
                           Text(
-                            'Listening...',
+                            't3'.tr,
                             style: TextStyle(
                                 fontSize: 18.sp, fontWeight: FontWeight.w500),
                           ),

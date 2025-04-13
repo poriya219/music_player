@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "592435469199",
+    "project_id": "poqi-music-flow",
+    "storage_bucket": "poqi-music-flow.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:592435469199:android:b12e84676034f1fa35c9fa",
+        "android_client_info": {
+          "package_name": "com.poqi.music.MusicFlow"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcNtYdTxxs89T_ZAPrE9EhK7ulp_misQo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

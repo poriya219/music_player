@@ -15,7 +15,8 @@ class AdController extends GetxController {
     show(placementId, 0);
   }
 
-  show(placementId, int retry) {
+  show(placementId, int retry) async {
+    await Future.delayed(const Duration(seconds: 2));
     AdiveryPlugin.isLoaded(placementId)
         .then((isLoaded) => showPlacement(isLoaded, placementId, retry));
   }

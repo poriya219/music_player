@@ -57,7 +57,7 @@ class SongsList extends StatelessWidget {
               SizedBox(
                 width: 3.w,
               ),
-              const Text('Shuffle playback'),
+              Text('t10'.tr),
               const Spacer(),
               GestureDetector(
                 onTap: () async {
@@ -78,21 +78,15 @@ class SongsList extends StatelessWidget {
                             Padding(
                               padding: EdgeInsets.symmetric(vertical: 3.h),
                               child: Text(
-                                'Sort songs',
+                                't14'.tr,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 17.sp,
                                 ),
                               ),
                             ),
-                            sortCard(
-                                title: 'By adding time',
-                                value: 0,
-                                isDark: isDark),
-                            sortCard(
-                                title: 'By the numbers of times played',
-                                value: 1,
-                                isDark: isDark),
+                            sortCard(title: 't15'.tr, value: 0, isDark: isDark),
+                            sortCard(title: 't16'.tr, value: 1, isDark: isDark),
                             SizedBox(
                               height: 3.h,
                             ),
@@ -261,10 +255,10 @@ class SongsList extends StatelessWidget {
                   size: 6.w,
                   // color: Colors.red,
                 ),
-                items: const [
+                items: [
                   DropdownMenuItem(
                     value: 0,
-                    child: Text('Add to playlist'),
+                    child: Text('t13'.tr),
                   ),
                 ],
                 onChanged: (value) {

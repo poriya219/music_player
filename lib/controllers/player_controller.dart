@@ -79,12 +79,17 @@ class PlayerController extends GetxController {
     update();
   }
 
-  sourceListGetter({required List<SongModel> list, required int index}) async {
+  sourceListGetter(
+      {required List<SongModel> list, required int index, bool? play}) async {
     Directory tempDir = await getApplicationDocumentsDirectory();
     String tempPath = tempDir.path;
     if (list.isNotEmpty) {
+      // print('playlist: ${playlist.toString()}');
+      // String temp = jsonEncode(list);
+      // print('json list: $list');
       resetPlayList();
       setCurrentIndex(index);
+      List listToSave = [];
       for (var each in list) {
         var filePath = '$tempPath/file_${each.id}.png';
         playlist.add(
@@ -99,34 +104,42 @@ class PlayerController extends GetxController {
             ),
           ),
         );
+        listToSave.add(each.getMap);
       }
       player.setAudioSource(playlist, initialIndex: index);
-      player.play().then((value) {
-        final appController = Get.find<AppController>();
+      if (play != false) {
+        final prefs = await SharedPreferences.getInstance();
+        prefs.setString('last_play_list', jsonEncode(listToSave));
+        prefs.setInt('last_play_index', index);
+        player.play().then((value) {
+          final appController = Get.find<AppController>();
 
-        appController.seekSliderController(1);
-      });
-
-      StreamSubscription? stream1;
-      StreamSubscription? stream2;
-      StreamSubscription? stream3;
-      if (stream1 != null) {
-        await stream1.cancel();
-      }
-      stream1 = player.currentIndexStream.listen((event) async {
-        setCurrentIndex(player.currentIndex ?? 0);
-        // String title = player.sequence![player.currentIndex ?? 0].tag.title;
-        // String artist = player.sequence![player.currentIndex ?? 0].tag.artist;
-        if (stream2 != null) {
-          await stream2!.cancel();
-        }
-        stream2 = player.playingStream.listen((plEvent) async {
-          if (stream3 != null) {
-            await stream3!.cancel();
-          }
-          stream3 = player.durationStream.listen((dEvent) async {});
+          appController.seekSliderController(1);
         });
-      });
+
+        StreamSubscription? stream1;
+        StreamSubscription? stream2;
+        StreamSubscription? stream3;
+        if (stream1 != null) {
+          await stream1.cancel();
+        }
+        stream1 = player.currentIndexStream.listen((event) async {
+          setCurrentIndex(player.currentIndex ?? 0);
+          final prefs = await SharedPreferences.getInstance();
+          prefs.setInt('last_play_index', player.currentIndex ?? 0);
+          // String title = player.sequence![player.currentIndex ?? 0].tag.title;
+          // String artist = player.sequence![player.currentIndex ?? 0].tag.artist;
+          if (stream2 != null) {
+            await stream2!.cancel();
+          }
+          stream2 = player.playingStream.listen((plEvent) async {
+            if (stream3 != null) {
+              await stream3!.cancel();
+            }
+            stream3 = player.durationStream.listen((dEvent) async {});
+          });
+        });
+      }
     }
   }
 

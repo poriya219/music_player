@@ -92,7 +92,7 @@ class SearchScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Search history',
+                        't18'.tr,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 17.sp,

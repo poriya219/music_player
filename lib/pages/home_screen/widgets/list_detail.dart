@@ -171,7 +171,7 @@ class ListDetail extends StatelessWidget {
                                 Expanded(
                                     child: Center(
                                   child: Text(
-                                    'Shuffle Play',
+                                    't10'.tr,
                                     style: TextStyle(
                                       fontSize: 16.sp,
                                       fontWeight: FontWeight.bold,
@@ -235,7 +235,7 @@ class ListDetail extends StatelessWidget {
                       height: 0.2.h,
                     ),
                     Text(
-                      song.artist ?? 'Unknown artist',
+                      song.artist ?? 't11'.tr,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(color: kTextGreyColor),
@@ -255,8 +255,8 @@ class ListDetail extends StatelessWidget {
                       DropdownMenuItem(
                         value: mode == ListDetailMode.playlist ? 0 : 1,
                         child: Text(mode == ListDetailMode.playlist
-                            ? 'Remove from playlist'
-                            : 'Add to playlist'),
+                            ? 't12'.tr
+                            : 't13'.tr),
                       ),
                     ],
                     onChanged: (value) async {

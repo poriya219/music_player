@@ -1,9 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:isolate';
 import 'dart:typed_data';
 
+import 'package:MusicFlow/controllers/player_controller.dart';
 import 'package:get/get.dart';
 import 'package:on_audio_query_forked/on_audio_query.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:widget_slider/controller.dart';
 
 class AppController extends GetxController {
@@ -89,7 +93,15 @@ class AppController extends GetxController {
   @override
   void onInit() {
     getAppInfo();
+    getLastPlay();
+    getLocale();
     super.onInit();
+  }
+
+  getLocale() async {
+    final prefs = await SharedPreferences.getInstance();
+    String locale = prefs.getString('locale') ?? 'en';
+    setSelectedLocale(locale);
   }
 
   getAppInfo() async {
@@ -110,6 +122,31 @@ class AppController extends GetxController {
   /// 1 is darkMode and 0 is lightMode
   setThemeValue(int value) {
     themeValue = value;
+    update();
+  }
+
+  getLastPlay() async {
+    final prefs = await SharedPreferences.getInstance();
+    int? index = prefs.getInt('last_play_index');
+    String? list = prefs.getString('last_play_list');
+    if (index != null && list != null) {
+      List data = jsonDecode(list);
+      List<SongModel> songModels = await Isolate.run(() {
+        List<SongModel> temp = [];
+        for (var each in data) {
+          temp.add(SongModel(each));
+        }
+        return temp;
+      });
+      final playerController = Get.put(PlayerController());
+      playerController.sourceListGetter(
+          list: songModels, index: index, play: false);
+    }
+  }
+
+  String selectedLocale = "en";
+  setSelectedLocale(String value) {
+    selectedLocale = value;
     update();
   }
 }
