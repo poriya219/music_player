@@ -325,10 +325,6 @@ class HomeScreen extends StatelessWidget {
                               controller: appController.sliderController,
                               onMove: (i) {
                                 if (!appController.isSeeking) {
-                                  print('current index: $i');
-                                  print('current cIndex: $cIndex');
-                                  print(
-                                      '###################################set 1');
                                   appController.seekSliderController(1);
                                   if (i == 2) {
                                     playerController.player.seekToNext();
@@ -346,7 +342,17 @@ class HomeScreen extends StatelessWidget {
                                     Get.to(() => PlaySongScreen());
                                   },
                                   child: Container(
-                                    color: Colors.transparent,
+                                    decoration: const BoxDecoration(
+                                      color: Colors.transparent,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Color(0xFF7B7C7D),
+                                          offset: Offset(5, -76),
+                                          blurRadius: 4,
+                                          spreadRadius: 0,
+                                        ),
+                                      ],
+                                    ),
                                     height: 9.h,
                                     child: Stack(
                                       alignment: Alignment.bottomCenter,
@@ -397,90 +403,99 @@ class HomeScreen extends StatelessWidget {
                                                   ),
                                                 ],
                                               )),
-                                              Stack(
-                                                alignment: Alignment.center,
-                                                children: [
-                                                  StreamBuilder(
-                                                      stream: playerController
-                                                          .player
-                                                          .durationStream,
-                                                      builder: (context,
-                                                          AsyncSnapshot
-                                                              dSnapshot) {
-                                                        return StreamBuilder(
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 3),
+                                                child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Stack(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      children: [
+                                                        StreamBuilder(
                                                             stream: playerController
                                                                 .player
-                                                                .positionStream,
+                                                                .durationStream,
                                                             builder: (context,
                                                                 AsyncSnapshot
-                                                                    pSnapshot) {
-                                                              if (pSnapshot
-                                                                      .hasData &&
-                                                                  dSnapshot
-                                                                      .hasData) {
-                                                                Duration duration = dSnapshot
-                                                                        .data ??
-                                                                    const Duration(
-                                                                        seconds:
-                                                                            1);
-                                                                Duration
-                                                                    position =
-                                                                    pSnapshot
-                                                                            .data ??
-                                                                        Duration
-                                                                            .zero;
-                                                                return CircularProgressIndicator(
-                                                                  value: position
-                                                                          .inSeconds /
-                                                                      duration
-                                                                          .inSeconds,
-                                                                  color:
-                                                                      kBlueColor,
-                                                                  strokeWidth:
-                                                                      3,
-                                                                  backgroundColor:
-                                                                      const Color(
-                                                                          0xFFCCCCCC),
-                                                                );
-                                                              } else {
-                                                                return const SizedBox();
-                                                              }
-                                                            });
-                                                      }),
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      if (isPlaying) {
-                                                        playerController.player
-                                                            .stop();
-                                                      } else {
-                                                        playerController.player
-                                                            .play();
-                                                      }
-                                                    },
-                                                    child: Icon(
-                                                      isPlaying
-                                                          ? Icons.pause
-                                                          : Icons.play_arrow,
-                                                      color: Theme.of(context)
-                                                          .iconTheme
-                                                          .color,
-                                                      size: 8.w,
+                                                                    dSnapshot) {
+                                                              return StreamBuilder(
+                                                                  stream: playerController
+                                                                      .player
+                                                                      .positionStream,
+                                                                  builder: (context,
+                                                                      AsyncSnapshot
+                                                                          pSnapshot) {
+                                                                    if (pSnapshot
+                                                                            .hasData &&
+                                                                        dSnapshot
+                                                                            .hasData) {
+                                                                      Duration
+                                                                          duration =
+                                                                          dSnapshot.data ??
+                                                                              const Duration(seconds: 1);
+                                                                      Duration
+                                                                          position =
+                                                                          pSnapshot.data ??
+                                                                              Duration.zero;
+                                                                      return CircularProgressIndicator(
+                                                                        value: position.inSeconds /
+                                                                            duration.inSeconds,
+                                                                        color:
+                                                                            kBlueColor,
+                                                                        strokeWidth:
+                                                                            3,
+                                                                        backgroundColor:
+                                                                            const Color(0xFFCCCCCC),
+                                                                      );
+                                                                    } else {
+                                                                      return const SizedBox();
+                                                                    }
+                                                                  });
+                                                            }),
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            if (isPlaying) {
+                                                              playerController
+                                                                  .player
+                                                                  .stop();
+                                                            } else {
+                                                              playerController
+                                                                  .player
+                                                                  .play();
+                                                            }
+                                                          },
+                                                          child: Icon(
+                                                            isPlaying
+                                                                ? Icons.pause
+                                                                : Icons
+                                                                    .play_arrow,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .iconTheme
+                                                                .color,
+                                                            size: 8.w,
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                width: 7.w,
-                                              ),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  playerController.player
-                                                      .seekToNext();
-                                                },
-                                                child: Icon(
-                                                  EvaIcons.skipForward,
-                                                  color: kTextGreyColor,
-                                                  size: 7.w,
+                                                    SizedBox(
+                                                      width: 7.w,
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        playerController.player
+                                                            .seekToNext();
+                                                      },
+                                                      child: Icon(
+                                                        EvaIcons.skipForward,
+                                                        color: kTextGreyColor,
+                                                        size: 7.w,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
                                               SizedBox(
@@ -643,7 +658,7 @@ class HomeScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(15),
             color: controller.selectedFilter == title
                 ? kBlueColor
-                : Get.theme.primaryColor,
+                : const Color(0xFF7b7c7d),
           ),
           child: Center(
             child: Text(

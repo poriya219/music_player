@@ -24,8 +24,6 @@ class SongsListController extends GetxController {
   }
 
   Future<List<SongModel>> sortSongList(List<SongModel> list, int value) async {
-    print('#');
-    print(value);
     final prefs = await SharedPreferences.getInstance();
     String playCounts = prefs.getString('playCount') ?? jsonEncode({});
     Map playCountMap = jsonDecode(playCounts);

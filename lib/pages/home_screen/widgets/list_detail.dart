@@ -263,11 +263,8 @@ class ListDetail extends StatelessWidget {
                       switch (value) {
                         case 0:
                           final OnAudioQuery audioQuery = OnAudioQuery();
-                          print(model.id);
-                          print(song.id);
                           bool status = await audioQuery.removeFromPlaylist(
                               model.id, song.id);
-                          print('status is: $status');
                           // Get.back();
                           kShowToast('Song removed from playlist');
                           final controller = Get.find<HomeController>();
@@ -285,8 +282,6 @@ class ListDetail extends StatelessWidget {
                                   return Card(
                                     child: InkWell(
                                       onTap: () {
-                                        print(playlist.id);
-                                        print(song.id);
                                         kAddToPlaylist(
                                             playlistId: playlist.id,
                                             audioId: song.id);

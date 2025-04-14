@@ -17,7 +17,7 @@ class TrackLyrics extends StatelessWidget {
       return lyricsController.lyricsString != null
           ? Container(
               decoration: BoxDecoration(
-                color: kBlueColor.withValues(alpha: 0.7),
+                color: kBlueColor,
                 borderRadius: BorderRadius.circular(20),
               ),
               width: 90.w,
@@ -28,7 +28,7 @@ class TrackLyrics extends StatelessWidget {
                   return const LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Colors.black, Colors.transparent],
+                    colors: [Colors.black, Colors.black, Colors.transparent],
                   ).createShader(Rect.fromLTRB(0, 0, rect.width, rect.height));
                 },
                 blendMode: BlendMode.dstIn,
@@ -48,7 +48,12 @@ class TrackLyrics extends StatelessWidget {
                                 lyricsController.lyricsString![index],
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                    color: Theme.of(context).iconTheme.color,
+                                    color: Colors.white,
+                                    fontFamily: kIsFa(lyricsController
+                                            .lyricsString![index]
+                                            .toString())
+                                        ? 'Peyda'
+                                        : 'OpenSans',
                                     fontSize: 18.sp,
                                     fontWeight: FontWeight.w500),
                               ),

@@ -95,7 +95,15 @@ class AppController extends GetxController {
     getAppInfo();
     getLastPlay();
     getLocale();
+    getTheme();
     super.onInit();
+  }
+
+  getTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    bool isDark = prefs.getBool('isDark') ?? (Get.isDarkMode);
+    int value = isDark ? 1 : 0;
+    setThemeValue(value);
   }
 
   getLocale() async {

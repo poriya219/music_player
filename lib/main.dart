@@ -3,6 +3,7 @@ import 'package:MusicFlow/firebase_options.dart';
 import 'package:MusicFlow/translations/translation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:MusicFlow/constans.dart';
@@ -23,6 +24,10 @@ void main() async {
     androidNotificationOngoing: true,
   );
   await Translator.initLanguages();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   final prefs = await SharedPreferences.getInstance();
   String userLocale = prefs.getString('locale') ??
       (Get.deviceLocale ?? const Locale('en')).languageCode;

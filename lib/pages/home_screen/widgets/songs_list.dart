@@ -163,7 +163,6 @@ class SongsList extends StatelessWidget {
       onTap: () async {
         final playerController = Get.put(PlayerController());
         // playerController.initialPlay(path: song.data);
-        print('index: $index');
         await playerController.sourceListGetter(list: songsList, index: index);
         Get.to(() => PlaySongScreen());
       },
@@ -276,8 +275,6 @@ class SongsList extends StatelessWidget {
                               return Card(
                                 child: InkWell(
                                   onTap: () {
-                                    print(playlist.id);
-                                    print(song.id);
                                     kAddToPlaylist(
                                         playlistId: playlist.id,
                                         audioId: song.id);

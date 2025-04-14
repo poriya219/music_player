@@ -6,10 +6,12 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 Color kBackBlackColor = const Color(0xFF191a1d);
-Color kBlueColor = const Color(0xFF3a62f1);
+// Color kBlueColor = const Color(0xFF3a62f1);
 Color kGreyColor = const Color(0xFF262626);
 Color kTextGreyColor = const Color(0xFF434446);
 Color kSecondColor = Colors.white;
+Color kBlueColor = const Color(0xFF4da5e0);
+const Color kLightPurpleColor = Color(0xFFa7a3ae);
 
 kShowToast(String title) {
   Fluttertoast.showToast(
@@ -43,4 +45,9 @@ kAddToPlaylist({required int playlistId, required int audioId}) async {
   kShowToast('Song added to playlist');
   final controller = Get.find<HomeController>();
   controller.resetPlaylists();
+}
+
+bool kIsFa(String text) {
+  final persianRegex = RegExp(r'[\u0600-\u06FF]');
+  return persianRegex.hasMatch(text);
 }

@@ -89,7 +89,7 @@ class FindSongScreen extends StatelessWidget {
                               end: Alignment.bottomRight,
                               colors: [
                                 kBlueColor,
-                                kGreyColor,
+                                const Color(0xFF7b7c7d),
                               ],
                             ),
                             shape: BoxShape.circle,
