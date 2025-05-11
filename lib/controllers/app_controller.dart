@@ -13,6 +13,12 @@ import 'package:widget_slider/controller.dart';
 class AppController extends GetxController {
   final SliderController sliderController = SliderController();
 
+  bool isFirstLunch = false;
+  setIsFirstLunch(bool value) {
+    isFirstLunch = value;
+    update();
+  }
+
   bool isSeeking = false;
   setIsSeeking(bool value) {
     isSeeking = value;
@@ -113,7 +119,12 @@ class AppController extends GetxController {
   }
 
   getAppInfo() async {
-    print('get app info');
+    final prefs = await SharedPreferences.getInstance();
+    bool isFirst = prefs.getBool('isFirst') ?? true;
+    if (isFirst) {
+      setIsFirstLunch(true);
+      prefs.setBool('isFirst', false);
+    }
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     appName = packageInfo.appName;
     version = packageInfo.version;

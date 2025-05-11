@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:MusicFlow/pages/equalizer/equalizer_screen.dart';
 import 'package:MusicFlow/pages/find_screen/find_song_screen.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -130,62 +131,67 @@ class HomeScreen extends StatelessWidget {
                                 mode: ListDetailMode.song,
                               ));
                         }),
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //   children: [
-                    //     Text(
-                    //       "t7".tr,
-                    //       style: TextStyle(
-                    //           fontWeight: FontWeight.w500, fontSize: 16.sp),
-                    //     ),
-                    //     Row(
-                    //       mainAxisSize: MainAxisSize.min,
-                    //       children: [
-                    //         TextButton(
-                    //             onPressed: () async {
-                    //               await Get.updateLocale(const Locale('fa'));
-                    //               final prefs =
-                    //                   await SharedPreferences.getInstance();
-                    //               prefs.setString('locale', 'fa');
-                    //               appController.setSelectedLocale('fa');
-                    //             },
-                    //             child: Text(
-                    //               'فارسی',
-                    //               style: TextStyle(
-                    //                   color:
-                    //                       appController.selectedLocale == 'fa'
-                    //                           ? null
-                    //                           : textColor),
-                    //             )),
-                    //         SizedBox(
-                    //           height: 15,
-                    //           width: 2,
-                    //           child: VerticalDivider(
-                    //             color: kGreyColor,
-                    //             width: 15,
-                    //             thickness: 2,
-                    //           ),
-                    //         ),
-                    //         TextButton(
-                    //             onPressed: () async {
-                    //               await Get.updateLocale(const Locale('en'));
-                    //               final prefs =
-                    //                   await SharedPreferences.getInstance();
-                    //               prefs.setString('locale', 'en');
-                    //               appController.setSelectedLocale('en');
-                    //             },
-                    //             child: Text(
-                    //               'English',
-                    //               style: TextStyle(
-                    //                   color:
-                    //                       appController.selectedLocale == 'en'
-                    //                           ? null
-                    //                           : textColor),
-                    //             )),
-                    //       ],
-                    //     ),
-                    //   ],
-                    // ),
+                    drawerButton(
+                        title: 'Equalizer',
+                        onTap: () {
+                          Get.to(() => EqualizerScreen());
+                        }),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "t7".tr,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500, fontSize: 16.sp),
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextButton(
+                                onPressed: () async {
+                                  await Get.updateLocale(const Locale('fa'));
+                                  final prefs =
+                                      await SharedPreferences.getInstance();
+                                  prefs.setString('locale', 'fa');
+                                  appController.setSelectedLocale('fa');
+                                },
+                                child: Text(
+                                  'فارسی',
+                                  style: TextStyle(
+                                      color:
+                                          appController.selectedLocale == 'fa'
+                                              ? null
+                                              : textColor),
+                                )),
+                            SizedBox(
+                              height: 15,
+                              width: 2,
+                              child: VerticalDivider(
+                                color: kGreyColor,
+                                width: 15,
+                                thickness: 2,
+                              ),
+                            ),
+                            TextButton(
+                                onPressed: () async {
+                                  await Get.updateLocale(const Locale('en'));
+                                  final prefs =
+                                      await SharedPreferences.getInstance();
+                                  prefs.setString('locale', 'en');
+                                  appController.setSelectedLocale('en');
+                                },
+                                child: Text(
+                                  'English',
+                                  style: TextStyle(
+                                      color:
+                                          appController.selectedLocale == 'en'
+                                              ? null
+                                              : textColor),
+                                )),
+                          ],
+                        ),
+                      ],
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -341,207 +347,215 @@ class HomeScreen extends StatelessWidget {
                                   onTap: () {
                                     Get.to(() => PlaySongScreen());
                                   },
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                      color: Colors.transparent,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Color(0xFF7B7C7D),
-                                          offset: Offset(5, -76),
-                                          blurRadius: 4,
-                                          spreadRadius: 0,
-                                        ),
-                                      ],
-                                    ),
-                                    height: 9.h,
-                                    child: Stack(
-                                      alignment: Alignment.bottomCenter,
-                                      children: [
-                                        Container(
-                                          width: 100.w,
-                                          height: 7.h,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              SizedBox(
-                                                width: 22.w,
-                                              ),
-                                              Expanded(
-                                                  child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    songTitle,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: TextStyle(
-                                                      fontSize: 16.sp,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    songArtist,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: TextStyle(
-                                                      fontSize: 16.sp,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: kTextGreyColor,
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                    height: 0.5.h,
-                                                  ),
-                                                ],
-                                              )),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    top: 3),
-                                                child: Row(
+                                  child: Directionality(
+                                    textDirection: TextDirection.ltr,
+                                    child: Container(
+                                      decoration: const BoxDecoration(
+                                        color: Colors.transparent,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Color(0xFF7B7C7D),
+                                            offset: Offset(5, -76),
+                                            blurRadius: 4,
+                                            spreadRadius: 0,
+                                          ),
+                                        ],
+                                      ),
+                                      height: 9.h,
+                                      child: Stack(
+                                        alignment: Alignment.bottomCenter,
+                                        children: [
+                                          Container(
+                                            width: 100.w,
+                                            height: 7.h,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                SizedBox(
+                                                  width: 22.w,
+                                                ),
+                                                Expanded(
+                                                    child: Column(
                                                   crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
                                                   children: [
-                                                    Stack(
-                                                      alignment:
-                                                          Alignment.center,
-                                                      children: [
-                                                        StreamBuilder(
-                                                            stream: playerController
-                                                                .player
-                                                                .durationStream,
-                                                            builder: (context,
-                                                                AsyncSnapshot
-                                                                    dSnapshot) {
-                                                              return StreamBuilder(
-                                                                  stream: playerController
-                                                                      .player
-                                                                      .positionStream,
-                                                                  builder: (context,
-                                                                      AsyncSnapshot
-                                                                          pSnapshot) {
-                                                                    if (pSnapshot
-                                                                            .hasData &&
-                                                                        dSnapshot
-                                                                            .hasData) {
-                                                                      Duration
-                                                                          duration =
-                                                                          dSnapshot.data ??
-                                                                              const Duration(seconds: 1);
-                                                                      Duration
-                                                                          position =
-                                                                          pSnapshot.data ??
-                                                                              Duration.zero;
-                                                                      return CircularProgressIndicator(
-                                                                        value: position.inSeconds /
-                                                                            duration.inSeconds,
-                                                                        color:
-                                                                            kBlueColor,
-                                                                        strokeWidth:
-                                                                            3,
-                                                                        backgroundColor:
-                                                                            const Color(0xFFCCCCCC),
-                                                                      );
-                                                                    } else {
-                                                                      return const SizedBox();
-                                                                    }
-                                                                  });
-                                                            }),
-                                                        GestureDetector(
-                                                          onTap: () {
-                                                            if (isPlaying) {
-                                                              playerController
-                                                                  .player
-                                                                  .stop();
-                                                            } else {
-                                                              playerController
-                                                                  .player
-                                                                  .play();
-                                                            }
-                                                          },
-                                                          child: Icon(
-                                                            isPlaying
-                                                                ? Icons.pause
-                                                                : Icons
-                                                                    .play_arrow,
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .iconTheme
-                                                                .color,
-                                                            size: 8.w,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    SizedBox(
-                                                      width: 7.w,
-                                                    ),
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        playerController.player
-                                                            .seekToNext();
-                                                      },
-                                                      child: Icon(
-                                                        EvaIcons.skipForward,
-                                                        color: kTextGreyColor,
-                                                        size: 7.w,
+                                                    Text(
+                                                      songTitle,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        fontSize: 16.sp,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                       ),
                                                     ),
+                                                    Text(
+                                                      songArtist,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        fontSize: 16.sp,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: kTextGreyColor,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      height: 0.5.h,
+                                                    ),
                                                   ],
+                                                )),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 3),
+                                                  child: Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Stack(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        children: [
+                                                          StreamBuilder(
+                                                              stream: playerController
+                                                                  .player
+                                                                  .durationStream,
+                                                              builder: (context,
+                                                                  AsyncSnapshot
+                                                                      dSnapshot) {
+                                                                return StreamBuilder(
+                                                                    stream: playerController
+                                                                        .player
+                                                                        .positionStream,
+                                                                    builder: (context,
+                                                                        AsyncSnapshot
+                                                                            pSnapshot) {
+                                                                      if (pSnapshot
+                                                                              .hasData &&
+                                                                          dSnapshot
+                                                                              .hasData) {
+                                                                        Duration
+                                                                            duration =
+                                                                            dSnapshot.data ??
+                                                                                const Duration(seconds: 1);
+                                                                        Duration
+                                                                            position =
+                                                                            pSnapshot.data ??
+                                                                                Duration.zero;
+                                                                        return CircularProgressIndicator(
+                                                                          value:
+                                                                              position.inSeconds / duration.inSeconds,
+                                                                          color:
+                                                                              kBlueColor,
+                                                                          strokeWidth:
+                                                                              3,
+                                                                          backgroundColor:
+                                                                              const Color(0xFFCCCCCC),
+                                                                        );
+                                                                      } else {
+                                                                        return const SizedBox();
+                                                                      }
+                                                                    });
+                                                              }),
+                                                          GestureDetector(
+                                                            onTap: () {
+                                                              if (isPlaying) {
+                                                                playerController
+                                                                    .player
+                                                                    .stop();
+                                                              } else {
+                                                                playerController
+                                                                    .player
+                                                                    .play();
+                                                              }
+                                                            },
+                                                            child: Icon(
+                                                              isPlaying
+                                                                  ? Icons.pause
+                                                                  : Icons
+                                                                      .play_arrow,
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .iconTheme
+                                                                  .color,
+                                                              size: 8.w,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      SizedBox(
+                                                        width: 7.w,
+                                                      ),
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          playerController
+                                                              .player
+                                                              .seekToNext();
+                                                        },
+                                                        child: Icon(
+                                                          EvaIcons.skipForward,
+                                                          color: kTextGreyColor,
+                                                          size: 7.w,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                              SizedBox(
-                                                width: 5.w,
-                                              ),
-                                            ],
+                                                SizedBox(
+                                                  width: 5.w,
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                        Positioned(
-                                            left: 4.w,
-                                            bottom: 2.h,
-                                            child: controller
-                                                    .isGrantedPermission
-                                                ? FutureBuilder(
-                                                    future: appController
-                                                        .getSongImage(
-                                                            artwork.id),
-                                                    builder: (context,
-                                                        AsyncSnapshot
-                                                            fSnapshot) {
-                                                      if (fSnapshot.hasData &&
-                                                          fSnapshot
-                                                                  .connectionState ==
-                                                              ConnectionState
-                                                                  .done) {
-                                                        Uint8List data =
-                                                            fSnapshot.data;
-                                                        return CircleAvatar(
-                                                            radius: 7.w,
-                                                            foregroundColor:
-                                                                kBlueColor,
-                                                            backgroundColor:
-                                                                kBlueColor,
-                                                            foregroundImage:
-                                                                MemoryImage(
-                                                                    data));
-                                                      } else {
-                                                        return SizedBox();
-                                                      }
-                                                    })
-                                                : CircleAvatar(
-                                                    radius: 7.w,
-                                                    foregroundColor: kBlueColor,
-                                                    backgroundColor: kBlueColor,
-                                                  )),
-                                      ],
+                                          Positioned(
+                                              left: 4.w,
+                                              bottom: 1.5.h,
+                                              child: controller
+                                                      .isGrantedPermission
+                                                  ? FutureBuilder(
+                                                      future: appController
+                                                          .getSongImage(
+                                                              artwork.id),
+                                                      builder: (context,
+                                                          AsyncSnapshot
+                                                              fSnapshot) {
+                                                        if (fSnapshot.hasData &&
+                                                            fSnapshot
+                                                                    .connectionState ==
+                                                                ConnectionState
+                                                                    .done) {
+                                                          Uint8List data =
+                                                              fSnapshot.data;
+                                                          return CircleAvatar(
+                                                              radius: 7.w,
+                                                              foregroundColor:
+                                                                  kBlueColor,
+                                                              backgroundColor:
+                                                                  kBlueColor,
+                                                              foregroundImage:
+                                                                  MemoryImage(
+                                                                      data));
+                                                        } else {
+                                                          return SizedBox();
+                                                        }
+                                                      })
+                                                  : CircleAvatar(
+                                                      radius: 7.w,
+                                                      foregroundColor:
+                                                          kBlueColor,
+                                                      backgroundColor:
+                                                          kBlueColor,
+                                                    )),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 );
@@ -556,11 +570,11 @@ class HomeScreen extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    filterContainer(title: 'Song'),
-                    filterContainer(title: 'Playlist'),
-                    filterContainer(title: 'Artist'),
-                    filterContainer(title: 'Album'),
-                    filterContainer(title: 'Genre'),
+                    filterContainer(title: 't19'),
+                    filterContainer(title: 't20'),
+                    filterContainer(title: 't21'),
+                    filterContainer(title: 't22'),
+                    filterContainer(title: 't23'),
                   ],
                 ),
               ),
@@ -575,32 +589,32 @@ class HomeScreen extends StatelessWidget {
                   onMove: (i) {
                     switch (i) {
                       case 0:
-                        controller.setSelectedFilter('Song');
+                        controller.setSelectedFilter('t19');
                         break;
                       case 1:
-                        controller.setSelectedFilter('Playlist');
+                        controller.setSelectedFilter('t20');
                         break;
                       case 2:
-                        controller.setSelectedFilter('Artist');
+                        controller.setSelectedFilter('t21');
                         break;
                       case 3:
-                        controller.setSelectedFilter('Album');
+                        controller.setSelectedFilter('t22');
                         break;
                       case 4:
-                        controller.setSelectedFilter('Genre');
+                        controller.setSelectedFilter('t23');
                         break;
                     }
                   },
                   itemBuilder: (context, index, activeIndex) {
-                    return controller.selectedFilter == 'Song'
+                    return controller.selectedFilter == 't19'
                         ? SongsList(songs: controller.songs)
-                        : controller.selectedFilter == 'Playlist'
+                        : controller.selectedFilter == 't20'
                             ? Playlists(playlists: controller.playLists)
-                            : controller.selectedFilter == 'Artist'
+                            : controller.selectedFilter == 't21'
                                 ? ArtistsList(artists: controller.artists)
-                                : controller.selectedFilter == 'Album'
+                                : controller.selectedFilter == 't22'
                                     ? AlbumsList(albums: controller.albums)
-                                    : controller.selectedFilter == 'Genre'
+                                    : controller.selectedFilter == 't23'
                                         ? GenresList(genres: controller.genres)
                                         : SizedBox();
                   },
@@ -630,15 +644,15 @@ class HomeScreen extends StatelessWidget {
 
   int sliderIndexGetter(String title) {
     switch (title) {
-      case 'Song':
+      case 't19':
         return 0;
-      case 'Playlist':
+      case 't20':
         return 1;
-      case 'Artist':
+      case 't21':
         return 2;
-      case 'Album':
+      case 't22':
         return 3;
-      case 'Genre':
+      case 't23':
         return 4;
       default:
         return 0;
@@ -662,7 +676,7 @@ class HomeScreen extends StatelessWidget {
           ),
           child: Center(
             child: Text(
-              title,
+              title.tr,
               style: TextStyle(
                 color: kSecondColor,
               ),

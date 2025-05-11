@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:MusicFlow/net.dart';
 import 'package:get/get.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as htmlParser;
@@ -35,21 +36,9 @@ class LyricsController extends GetxController {
       // Iterable<XmlElement> lyrics = lyricsDocument.findAllElements('Lyric');
       // setLyricsString(lyrics.first.innerText);
       if (title != 'Unknown' || artist != 'Unknown') {
-        const String cId =
-            "4qiX3aqJxsi0a8s3loupS9l8b1ieM7yCY6oiHmuSINggszNv9sGTvt5hp0PQHowK";
-        const String cSecret =
-            "81d1vo2uosuC2AAAOSdJOVZrPG4A9mC1YCROPXqXO6mzV28ReYD8WLK0yohlWnKsgnGzZK5bxFeJKvCkj0kf8A";
-        const String cToken =
-            "Cos-NlfORWlLu61wHf0rtKl00QdYvNn_4uI_5XaTfw2lavQnlbL_6CIFFNZzy6E0";
-        final searchUrl = Uri.parse(
-            'https://api.genius.com/search?q=${Uri.encodeComponent("$title $artist")}');
-
-        final response = await http.get(
-          searchUrl,
-          headers: {
-            'Authorization': 'Bearer $cToken',
-          },
-        );
+        Network network = Network();
+        final response =
+            await network.getSongLyrics(title: title, artist: artist);
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
           final hits = data['response']['hits'];

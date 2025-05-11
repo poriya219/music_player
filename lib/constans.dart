@@ -1,3 +1,5 @@
+import 'package:MusicFlow/controllers/app_controller.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:MusicFlow/pages/home_screen/controller/home_controller.dart';
@@ -50,4 +52,15 @@ kAddToPlaylist({required int playlistId, required int audioId}) async {
 bool kIsFa(String text) {
   final persianRegex = RegExp(r'[\u0600-\u06FF]');
   return persianRegex.hasMatch(text);
+}
+
+Widget kBackIcon() {
+  final appController = Get.put(AppController());
+  return Icon(
+    appController.selectedLocale == 'en'
+        ? EvaIcons.arrowIosBack
+        : EvaIcons.arrowIosForward,
+    color: Theme.of(Get.context!).primaryColor,
+    size: 7.w,
+  );
 }

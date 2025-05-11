@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.5+3
+version: 1.0.7+5
 
 environment:
   sdk: '>=3.1.0 <4.0.0'
@@ -48,7 +48,6 @@ dependencies:
   eva_icons_flutter: ^3.1.0
   xml: ^6.5.0
   fluttertoast: ^8.2.12
-  flutter_launcher_icons: ^0.14.3
   animations: ^2.0.11
   we_slide: ^2.4.0
   widget_slider: ^0.1.0
@@ -63,12 +62,8 @@ dependencies:
   adivery:
     path: packages/adivery
   # url_launcher: 6.3.0
-
-flutter_launcher_icons:
-  android: "launcher_icon"
-  ios: false
-  image_path: "assets/images/li.png"
-  min_sdk_android: 21 # android min sdk min:16, default 21
+  mini_music_visualizer: ^1.1.4
+  home_widget: ^0.7.0+1
 
 dev_dependencies:
   flutter_test:

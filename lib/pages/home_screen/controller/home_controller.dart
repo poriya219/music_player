@@ -66,7 +66,7 @@ class HomeController extends GetxController {
   List<PlaylistModel> playLists = [];
   List<GenreModel> genres = [];
 
-  String selectedFilter = 'Song';
+  String selectedFilter = 't19';
   setSelectedFilter(String value) {
     selectedFilter = value;
     update();

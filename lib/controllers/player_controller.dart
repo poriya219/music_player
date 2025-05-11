@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 
+import 'package:MusicFlow/controllers/ad_controller.dart';
 import 'package:get/get.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:MusicFlow/controllers/app_controller.dart';
@@ -77,6 +79,17 @@ class PlayerController extends GetxController {
   setCurrentIndex(int value) {
     currentIndex = value;
     update();
+    addPlayCount();
+  }
+
+  int playCount = 0;
+  addPlayCount() {
+    playCount = playCount + 1;
+    if (playCount % 25 == 0) {
+      playCount = 0;
+      final adController = Get.find<AdController>();
+      adController.showInterstitial();
+    }
   }
 
   sourceListGetter(
@@ -125,6 +138,7 @@ class PlayerController extends GetxController {
         }
         stream1 = player.currentIndexStream.listen((event) async {
           setCurrentIndex(player.currentIndex ?? 0);
+          // updateMusicWidget()
           final prefs = await SharedPreferences.getInstance();
           prefs.setInt('last_play_index', player.currentIndex ?? 0);
           // String title = player.sequence![player.currentIndex ?? 0].tag.title;
@@ -133,6 +147,7 @@ class PlayerController extends GetxController {
             await stream2!.cancel();
           }
           stream2 = player.playingStream.listen((plEvent) async {
+            // updateMusicWidget()
             if (stream3 != null) {
               await stream3!.cancel();
             }
@@ -180,5 +195,21 @@ class PlayerController extends GetxController {
     Timer(const Duration(milliseconds: 300), () {
       setIsSeeking(false);
     });
+  }
+
+  Future<void> updateMusicWidget({
+    required String title,
+    required String artist,
+    required String imagePath,
+    required bool isPlaying,
+    required bool isLiked,
+  }) async {
+    await HomeWidget.saveWidgetData<String>('song_title', title);
+    await HomeWidget.saveWidgetData<String>('song_artist', artist);
+    await HomeWidget.saveWidgetData<String>('song_image', imagePath);
+    await HomeWidget.saveWidgetData<bool>('is_playing', isPlaying);
+    await HomeWidget.saveWidgetData<bool>('is_liked', isLiked);
+    await HomeWidget.updateWidget(
+        name: 'MusicWidgetProvider', iOSName: 'MusicWidget');
   }
 }

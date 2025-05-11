@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:MusicFlow/constans.dart';
 import 'package:MusicFlow/pages/home_screen/home_screen.dart';
@@ -15,6 +16,7 @@ import 'bindings.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  HomeWidget.registerInteractivityCallback(backgroundCallback);
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -50,6 +52,7 @@ class MyApp extends StatelessWidget {
     return ResponsiveSizer(builder: (context, orientation, screenType) {
       return GetMaterialApp(
         title: 'MusicFlow',
+        debugShowCheckedModeBanner: false,
         initialBinding: Initializer(),
         navigatorObservers: <NavigatorObserver>[analyticsService.getObserver()],
         themeMode: isDark == null
@@ -60,8 +63,15 @@ class MyApp extends StatelessWidget {
           textTheme: Theme.of(context).textTheme.apply(
                 bodyColor: Colors.white, //<-- SEE HERE
                 displayColor: Colors.pinkAccent, //<-- SEE HERE
-                fontFamily: "OpenSans",
+                fontFamily: userLocale == 'fa' ? "Peyda" : "OpenSans",
               ),
+          appBarTheme: AppBarTheme(
+            titleTextStyle: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+              fontSize: 18.sp,
+            ),
+          ),
           primaryColor: kTextGreyColor,
           primaryColorLight: kBackBlackColor,
           iconTheme: const IconThemeData(color: Colors.white),
@@ -83,7 +93,15 @@ class MyApp extends StatelessWidget {
           textTheme: Theme.of(context).textTheme.apply(
                 bodyColor: kBackBlackColor, //<-- SEE HERE
                 displayColor: Colors.pinkAccent, //<-- SEE HERE
+                fontFamily: userLocale == 'fa' ? "Peyda" : "OpenSans",
               ),
+          appBarTheme: AppBarTheme(
+            titleTextStyle: TextStyle(
+              color: kBackBlackColor,
+              fontWeight: FontWeight.w500,
+              fontSize: 18.sp,
+            ),
+          ),
           primaryColor: kTextGreyColor,
           primaryColorLight: Colors.white,
           iconTheme: IconThemeData(color: kBackBlackColor),
@@ -104,5 +122,22 @@ class MyApp extends StatelessWidget {
         home: HomeScreen(),
       );
     });
+  }
+}
+
+Future<void> backgroundCallback(Uri? uri) async {
+  switch (uri?.host) {
+    case 'play_pause':
+      // toggle play/pause
+      break;
+    case 'next':
+      // next track
+      break;
+    case 'previous':
+      // previous track
+      break;
+    case 'like':
+      // toggle like
+      break;
   }
 }

@@ -32,7 +32,7 @@ class SearchScreen extends StatelessWidget {
                         onTap: () {
                           Get.back();
                         },
-                        child: Icon(EvaIcons.arrowIosBack),
+                        child: kBackIcon(),
                       ),
                       Expanded(
                           child: Container(
@@ -71,7 +71,7 @@ class SearchScreen extends StatelessWidget {
                                   });
                                 },
                                 decoration: InputDecoration(
-                                    hintText: 'Search for songs on device',
+                                    hintText: 't24'.tr,
                                     contentPadding:
                                         EdgeInsets.symmetric(vertical: 1.8.h),
                                     hintStyle: TextStyle(fontSize: 15.sp),

@@ -99,19 +99,25 @@ class AlbumsList extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  album.album,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                SizedBox(
+                  width: 90.w - 2.w - 6.7.h,
+                  child: Text(
+                    album.album,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 SizedBox(
                   height: 0.2.h,
                 ),
-                Text(
-                  '${album.artist}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: kTextGreyColor),
+                SizedBox(
+                  width: 90.w - 2.w - 6.7.h,
+                  child: Text(
+                    '${album.artist}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: kTextGreyColor),
+                  ),
                 ),
               ],
             ),

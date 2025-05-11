@@ -28,7 +28,7 @@ class FindSongScreen extends StatelessWidget {
                       onTap: () {
                         Get.back();
                       },
-                      child: Icon(EvaIcons.arrowIosBack),
+                      child: kBackIcon(),
                     ),
                   ],
                 ),

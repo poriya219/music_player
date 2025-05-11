@@ -1,7 +1,9 @@
+import 'package:MusicFlow/constans.dart';
 import 'package:MusicFlow/pages/play_song_screen/widgets/play_buttons.dart';
 import 'package:MusicFlow/pages/play_song_screen/widgets/play_slider.dart';
 import 'package:MusicFlow/pages/play_song_screen/widgets/similar_tracks.dart';
 import 'package:MusicFlow/pages/play_song_screen/widgets/track_lyrics.dart';
+import 'package:adivery/adivery_ads.dart';
 import 'package:animations/animations.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
@@ -101,34 +103,33 @@ class PlaySongScreen extends StatelessWidget {
                                     onPressed: () {
                                       Get.back();
                                     },
-                                    icon: Icon(
-                                      EvaIcons.arrowIosBack,
-                                      color: Theme.of(context).primaryColor,
-                                      size: 7.w,
-                                    ),
+                                    icon: kBackIcon(),
                                   ),
-                                  Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        songTitle,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 17.sp,
+                                  SizedBox(
+                                    width: 70.w,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          songTitle,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 17.sp,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      Text(
-                                        songArtist,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 16.sp,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      )
-                                    ],
+                                        Text(
+                                          songArtist,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 16.sp,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        )
+                                      ],
+                                    ),
                                   ),
                                   SizedBox(
                                     width: 10.w,
@@ -147,17 +148,22 @@ class PlaySongScreen extends StatelessWidget {
                                         child: SizedBox(
                                           width: 85.w,
                                           height: 85.w,
-                                          child: artwork,
+                                          child: Directionality(
+                                              textDirection: TextDirection.ltr,
+                                              child: artwork),
                                         ),
                                       ),
                                     ),
                                     SizedBox(
                                       height: 4.h,
                                     ),
-                                    PlayButtons(
-                                      player: controller.player,
-                                      artwork: artwork,
-                                      songTitle: songTitle,
+                                    Directionality(
+                                      textDirection: TextDirection.ltr,
+                                      child: PlayButtons(
+                                        player: controller.player,
+                                        artwork: artwork,
+                                        songTitle: songTitle,
+                                      ),
                                     ),
                                     SizedBox(
                                       height: 8.h,
@@ -166,6 +172,9 @@ class PlaySongScreen extends StatelessWidget {
                                         songArtist: songArtist,
                                         songTitle: songTitle),
                                     const SimilarTracks(),
+                                    const BannerAd(
+                                        "9472ec74-8b8f-4e38-8913-9315b85da184",
+                                        BannerAdSize.BANNER),
                                   ],
                                 ),
                               ),

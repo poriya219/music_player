@@ -1,3 +1,4 @@
+import 'package:MusicFlow/controllers/app_controller.dart';
 import 'package:adivery/adivery.dart';
 import 'package:get/get.dart';
 
@@ -9,10 +10,14 @@ class AdController extends GetxController {
     super.onInit();
   }
 
-  showInterstitial() {
-    const String placementId = "afeb3184-86ad-44c8-b720-24d03f984719";
-    AdiveryPlugin.prepareInterstitialAd(placementId);
-    show(placementId, 0);
+  showInterstitial() async {
+    final appController = Get.put(AppController());
+    await Future.delayed(const Duration(seconds: 10));
+    if (!appController.isFirstLunch) {
+      const String placementId = "afeb3184-86ad-44c8-b720-24d03f984719";
+      AdiveryPlugin.prepareInterstitialAd(placementId);
+      show(placementId, 0);
+    }
   }
 
   show(placementId, int retry) async {

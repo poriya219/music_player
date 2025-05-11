@@ -29,10 +29,7 @@ class ListDetail extends StatelessWidget {
             onPressed: () {
               Get.back();
             },
-            icon: Icon(
-              EvaIcons.arrowBack,
-              color: Theme.of(context).iconTheme.color,
-            )),
+            icon: kBackIcon()),
       ),
       body: SafeArea(
         child: Padding(
@@ -153,32 +150,35 @@ class ListDetail extends StatelessWidget {
                                   list: list, index: index);
                             }
                           },
-                          child: Container(
-                            width: 90.w,
-                            height: 7.h,
-                            decoration: BoxDecoration(
-                                color: Get.theme.primaryColor,
-                                borderRadius: BorderRadius.circular(15)),
-                            child: Row(
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.only(left: 7.w),
-                                  child: Icon(
-                                    EvaIcons.shuffle2,
-                                    size: 7.w,
-                                  ),
-                                ),
-                                Expanded(
-                                    child: Center(
-                                  child: Text(
-                                    't10'.tr,
-                                    style: TextStyle(
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.bold,
+                          child: Directionality(
+                            textDirection: TextDirection.ltr,
+                            child: Container(
+                              width: 90.w,
+                              height: 7.h,
+                              decoration: BoxDecoration(
+                                  color: Get.theme.primaryColor,
+                                  borderRadius: BorderRadius.circular(15)),
+                              child: Row(
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 7.w),
+                                    child: Icon(
+                                      EvaIcons.shuffle2,
+                                      size: 7.w,
                                     ),
                                   ),
-                                ))
-                              ],
+                                  Expanded(
+                                      child: Center(
+                                    child: Text(
+                                      't10'.tr,
+                                      style: TextStyle(
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ))
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -330,15 +330,27 @@ class ListDetail extends StatelessWidget {
       {required ListDetailMode mode, required dynamic model}) {
     switch (mode) {
       case ListDetailMode.album:
-        return ['ALBUM - ${model.numOfSongs} SONG', '${model.album}'];
+        return [
+          '${'t22'.tr} - ${model.numOfSongs} ${'t19'.tr}',
+          '${model.album}'
+        ];
       case ListDetailMode.artist:
-        return ['ARTIST - ${model.numberOfTracks} SONG', '${model.artist}'];
+        return [
+          '${'t21'.tr} - ${model.numberOfTracks} ${'t19'.tr}',
+          '${model.artist}'
+        ];
       case ListDetailMode.genre:
-        return ['GENRE - ${model.numOfSongs} SONG', '${model.genre}'];
+        return [
+          '${'t23'.tr} - ${model.numOfSongs} ${'t19'.tr}',
+          '${model.genre}'
+        ];
       case ListDetailMode.playlist:
-        return ['Playlist - ${model.numOfSongs} SONG', '${model.playlist}'];
+        return [
+          '${'t20'.tr} - ${model.numOfSongs} ${'t19'.tr}',
+          '${model.playlist}'
+        ];
       case ListDetailMode.song:
-        return ['Liked Songs - ${model.length} SONG', ''];
+        return ['${'t9'.tr} - ${model.length} ${'t19'.tr}', ''];
       default:
         return ['', ''];
     }
