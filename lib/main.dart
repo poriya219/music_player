@@ -1,4 +1,5 @@
 import 'package:MusicFlow/controllers/analytics.dart';
+import 'package:MusicFlow/controllers/player_controller.dart';
 import 'package:MusicFlow/firebase_options.dart';
 import 'package:MusicFlow/translations/translation.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -126,9 +127,15 @@ class MyApp extends StatelessWidget {
 }
 
 Future<void> backgroundCallback(Uri? uri) async {
+  print('action: ${uri?.host}');
+  final playerController = Get.put(PlayerController());
   switch (uri?.host) {
     case 'play_pause':
-      // toggle play/pause
+      if (playerController.player.playing) {
+        playerController.player.pause();
+      } else {
+        playerController.player.play();
+      }
       break;
     case 'next':
       // next track

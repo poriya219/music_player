@@ -4,6 +4,7 @@ import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:MusicFlow/controllers/player_controller.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:on_audio_query_forked/on_audio_query.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -167,5 +168,30 @@ class AppController extends GetxController {
   setSelectedLocale(String value) {
     selectedLocale = value;
     update();
+  }
+
+  final MethodChannel _platform = const MethodChannel('equalizer_channel');
+
+  Future<int> removeSongFromPlaylist(int playlistId, int audioId) async {
+    try {
+      final result = await _platform.invokeMethod<int>('removeFromPlaylist', {
+        'playlistId': playlistId,
+        'audioId': audioId,
+      });
+      return result ?? 0;
+    } catch (e) {
+      return -1;
+    }
+  }
+
+  Future<int> deletePlaylist(int playlistId) async {
+    try {
+      final result = await _platform.invokeMethod<int>('deletePlaylist', {
+        'playlistId': playlistId,
+      });
+      return result ?? 0;
+    } catch (e) {
+      return -1;
+    }
   }
 }

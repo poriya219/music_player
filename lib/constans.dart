@@ -40,15 +40,6 @@ kShowDialog({required Widget child, required double verticalPadding}) {
   );
 }
 
-kAddToPlaylist({required int playlistId, required int audioId}) async {
-  final OnAudioQuery audioQuery = OnAudioQuery();
-  await audioQuery.addToPlaylist(playlistId, audioId);
-  Get.back();
-  kShowToast('Song added to playlist');
-  final controller = Get.find<HomeController>();
-  controller.resetPlaylists();
-}
-
 bool kIsFa(String text) {
   final persianRegex = RegExp(r'[\u0600-\u06FF]');
   return persianRegex.hasMatch(text);

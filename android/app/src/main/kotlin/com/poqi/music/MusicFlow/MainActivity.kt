@@ -4,6 +4,9 @@ import android.media.audiofx.Equalizer
 import com.ryanheise.audioservice.AudioServiceActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import android.content.ContentUris
+import android.net.Uri
+import android.provider.MediaStore
 
 class MainActivity : AudioServiceActivity() {
     private val CHANNEL = "equalizer_channel"
@@ -68,6 +71,26 @@ class MainActivity : AudioServiceActivity() {
                     equalizer?.enabled = enabled
                     result.success(true)
                 }
+
+                "removeFromPlaylist" -> {
+                    val playlistId = (call.argument<Int>("playlistId") ?: -1).toLong()
+                    val audioId = (call.argument<Int>("audioId") ?: -1).toLong()
+
+        val uri: Uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId)
+        val selection = "${MediaStore.Audio.Playlists.Members.AUDIO_ID}=?"
+        val selectionArgs = arrayOf(audioId.toString())
+
+        val rowsDeleted = contentResolver.delete(uri, selection, selectionArgs)
+        result.success(rowsDeleted)
+    }
+
+    "deletePlaylist" -> {
+        val playlistId = (call.argument<Int>("playlistId") ?: -1).toLong()
+        val uri = ContentUris.withAppendedId(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, playlistId)
+
+        val rowsDeleted = contentResolver.delete(uri, null, null)
+        result.success(rowsDeleted)
+    }
 
                 else -> result.notImplemented()
             }

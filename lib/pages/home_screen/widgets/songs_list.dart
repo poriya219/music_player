@@ -270,20 +270,17 @@ class SongsList extends StatelessWidget {
                             itemCount: homeController.playLists.length,
                             shrinkWrap: true,
                             itemBuilder: (context, index) {
-                              PlaylistModel playlist =
-                                  homeController.playLists[index];
+                              Map playlist = homeController.playLists[index];
                               return Card(
                                 child: InkWell(
                                   onTap: () {
-                                    kAddToPlaylist(
-                                        playlistId: playlist.id,
-                                        audioId: song.id);
+                                    homeController.addToPlaylist(song, index);
                                   },
                                   child: Padding(
                                     padding: EdgeInsets.symmetric(
                                         horizontal: 5.w, vertical: 1.5.h),
                                     child: Text(
-                                      playlist.playlist,
+                                      playlist['title'],
                                     ),
                                   ),
                                 ),

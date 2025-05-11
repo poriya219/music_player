@@ -1,12 +1,15 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
 
+import 'package:MusicFlow/constans.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:MusicFlow/controllers/app_controller.dart';
 import 'package:on_audio_query_forked/on_audio_query.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeController extends GetxController {
   @override
@@ -35,8 +38,11 @@ class HomeController extends GetxController {
   }
 
   resetPlaylists() async {
-    final OnAudioQuery audioQuery = OnAudioQuery();
-    List<PlaylistModel> pl = await audioQuery.queryPlaylists();
+    // final OnAudioQuery audioQuery = OnAudioQuery();
+    // List<PlaylistModel> pl = await audioQuery.queryPlaylists();
+    final prefs = await SharedPreferences.getInstance();
+    String pString = prefs.getString('playlists') ?? jsonEncode([]);
+    List pl = jsonDecode(pString);
     playLists = pl;
     update();
   }
@@ -46,11 +52,14 @@ class HomeController extends GetxController {
     final OnAudioQuery audioQuery = OnAudioQuery();
     List<AlbumModel> al = await audioQuery.queryAlbums();
     List<ArtistModel> ar = await audioQuery.queryArtists();
-    List<PlaylistModel> pl = await audioQuery.queryPlaylists();
+    // List<PlaylistModel> pl = await audioQuery.queryPlaylists();
     List<GenreModel> ge = await audioQuery.queryGenres();
     List<SongModel> so = await audioQuery.querySongs(
         sortType: SongSortType.DATE_ADDED,
         orderType: OrderType.DESC_OR_GREATER);
+    final prefs = await SharedPreferences.getInstance();
+    String pString = prefs.getString('playlists') ?? jsonEncode([]);
+    List pl = jsonDecode(pString);
     songs = so;
     albums = al;
     artists = ar;
@@ -63,12 +72,54 @@ class HomeController extends GetxController {
   List<SongModel> songs = [];
   List<AlbumModel> albums = [];
   List<ArtistModel> artists = [];
-  List<PlaylistModel> playLists = [];
+  List playLists = [];
   List<GenreModel> genres = [];
 
   String selectedFilter = 't19';
   setSelectedFilter(String value) {
     selectedFilter = value;
+    update();
+  }
+
+  createPlayList({required String title}) async {
+    final prefs = await SharedPreferences.getInstance();
+    playLists.add({
+      'title': title,
+      'image': '',
+      'songs': [],
+    });
+    await prefs.setString('playlists', jsonEncode(playLists));
+    kShowToast('Playlist Created');
+    Get.back();
+    update();
+  }
+
+  addToPlaylist(SongModel song, int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    Map temp = playLists[index];
+    List songs = temp['songs'];
+    songs.add(song.getMap);
+    temp['songs'] = songs;
+    playLists.removeAt(index);
+    playLists.insert(index, temp);
+    await prefs.setString('playlists', jsonEncode(playLists));
+    Get.back();
+    kShowToast('Song added to playlist');
+    update();
+  }
+
+  removeFromPlaylist(Map playlist, int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    int lIndex = playLists.indexOf(playlist);
+    Map temp = playLists[lIndex];
+    List songs = temp['songs'];
+    songs = songs.removeAt(index);
+    temp['songs'] = songs;
+    playLists.removeAt(lIndex);
+    playLists.insert(lIndex, temp);
+    await prefs.setString('playlists', jsonEncode(playLists));
+    kShowToast('Song removed from playlist');
+    Get.back();
     update();
   }
 

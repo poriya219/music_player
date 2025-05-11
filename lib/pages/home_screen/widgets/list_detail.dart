@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:on_audio_query_forked/on_audio_query.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -55,7 +56,9 @@ class ListDetail extends StatelessWidget {
                                         mode: mode,
                                         id: mode == ListDetailMode.song
                                             ? (model.isEmpty ? 0 : model[0].id)
-                                            : model.id),
+                                            : mode == ListDetailMode.playlist
+                                                ? 0
+                                                : model.id),
                                     builder: (context, AsyncSnapshot snapshot) {
                                       if (snapshot.connectionState ==
                                               ConnectionState.done &&
@@ -243,82 +246,75 @@ class ListDetail extends StatelessWidget {
                   ],
                 ),
               ),
-              if (mode != ListDetailMode.playlist) ...{
-                DropdownButtonHideUnderline(
-                  child: DropdownButton2(
-                    customButton: Icon(
-                      Icons.more_vert,
-                      size: 6.w,
-                      // color: Colors.red,
+              // if (mode != ListDetailMode.playlist) ...{
+              DropdownButtonHideUnderline(
+                child: DropdownButton2(
+                  customButton: Icon(
+                    Icons.more_vert,
+                    size: 6.w,
+                    // color: Colors.red,
+                  ),
+                  items: [
+                    DropdownMenuItem(
+                      value: mode == ListDetailMode.playlist ? 0 : 1,
+                      child: Text(mode == ListDetailMode.playlist
+                          ? 't12'.tr
+                          : 't13'.tr),
                     ),
-                    items: [
-                      DropdownMenuItem(
-                        value: mode == ListDetailMode.playlist ? 0 : 1,
-                        child: Text(mode == ListDetailMode.playlist
-                            ? 't12'.tr
-                            : 't13'.tr),
-                      ),
-                    ],
-                    onChanged: (value) async {
-                      switch (value) {
-                        case 0:
-                          final OnAudioQuery audioQuery = OnAudioQuery();
-                          bool status = await audioQuery.removeFromPlaylist(
-                              model.id, song.id);
-                          // Get.back();
-                          kShowToast('Song removed from playlist');
-                          final controller = Get.find<HomeController>();
-                          controller.resetPlaylists();
-                        case 1:
-                          final homeController = Get.find<HomeController>();
-                          kShowDialog(
-                              verticalPadding: 30.h,
-                              child: ListView.builder(
-                                itemCount: homeController.playLists.length,
-                                shrinkWrap: true,
-                                itemBuilder: (context, index) {
-                                  PlaylistModel playlist =
-                                      homeController.playLists[index];
-                                  return Card(
-                                    child: InkWell(
-                                      onTap: () {
-                                        kAddToPlaylist(
-                                            playlistId: playlist.id,
-                                            audioId: song.id);
-                                      },
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 5.w, vertical: 1.5.h),
-                                        child: Text(
-                                          playlist.playlist,
-                                        ),
+                  ],
+                  onChanged: (value) async {
+                    switch (value) {
+                      case 0:
+                        final homeController = Get.find<HomeController>();
+                        homeController.removeFromPlaylist(model, index);
+
+                      case 1:
+                        final homeController = Get.find<HomeController>();
+                        kShowDialog(
+                            verticalPadding: 30.h,
+                            child: ListView.builder(
+                              itemCount: homeController.playLists.length,
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                Map playlist = homeController.playLists[index];
+                                return Card(
+                                  child: InkWell(
+                                    onTap: () {
+                                      homeController.addToPlaylist(song, index);
+                                    },
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 5.w, vertical: 1.5.h),
+                                      child: Text(
+                                        playlist['title'],
                                       ),
                                     ),
-                                  );
-                                },
-                              ));
-                      }
-                    },
-                    dropdownStyleData: DropdownStyleData(
-                      width: 50.w,
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        // color: Colors.redAccent,
-                      ),
-                      offset: const Offset(0, 8),
+                                  ),
+                                );
+                              },
+                            ));
+                    }
+                  },
+                  dropdownStyleData: DropdownStyleData(
+                    width: 50.w,
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4),
+                      // color: Colors.redAccent,
                     ),
-                    menuItemStyleData: MenuItemStyleData(
-                      // customHeights: [
-                      //   ...List<double>.filled(MenuItems.firstItems.length, 48),
-                      //   8,
-                      //   ...List<double>.filled(MenuItems.secondItems.length, 48),
-                      // ],
-                      padding: const EdgeInsets.only(left: 16, right: 16),
-                    ),
+                    offset: const Offset(0, 8),
+                  ),
+                  menuItemStyleData: const MenuItemStyleData(
+                    // customHeights: [
+                    //   ...List<double>.filled(MenuItems.firstItems.length, 48),
+                    //   8,
+                    //   ...List<double>.filled(MenuItems.secondItems.length, 48),
+                    // ],
+                    padding: EdgeInsets.only(left: 16, right: 16),
                   ),
                 ),
-              }
+              ),
+              // }
             ],
           ),
         ),
@@ -345,18 +341,21 @@ class ListDetail extends StatelessWidget {
           '${model.genre}'
         ];
       case ListDetailMode.playlist:
+        List pSongs = model['songs'] ?? [];
         return [
-          '${'t20'.tr} - ${model.numOfSongs} ${'t19'.tr}',
-          '${model.playlist}'
+          '${'t20'.tr} - ${pSongs.length} ${'t19'.tr}',
+          '${model['title']}'
         ];
       case ListDetailMode.song:
         return ['${'t9'.tr} - ${model.length} ${'t19'.tr}', ''];
-      default:
-        return ['', ''];
     }
   }
 
   Future getImage({required ListDetailMode mode, required int id}) async {
+    if (mode == ListDetailMode.playlist) {
+      final ByteData bytes = await rootBundle.load('assets/images/gd.png');
+      final Uint8List list = bytes.buffer.asUint8List();
+    }
     switch (mode) {
       case ListDetailMode.album:
         return controller.getAlbumImage(id);
@@ -376,6 +375,13 @@ class ListDetail extends StatelessWidget {
     try {
       if (mode == ListDetailMode.song) {
         return model;
+      } else if (mode == ListDetailMode.playlist) {
+        List<SongModel> songs = [];
+        List pSongs = model['songs'] ?? [];
+        for (var each in pSongs) {
+          songs.add(SongModel(each));
+        }
+        return songs;
       } else {
         OnAudioQuery onAudioQuery = OnAudioQuery();
         var list =

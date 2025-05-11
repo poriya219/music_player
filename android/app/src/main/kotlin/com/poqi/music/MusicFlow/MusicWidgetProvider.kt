@@ -1,17 +1,20 @@
 package com.poqi.music.MusicFlow
 
+import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
+import android.content.Intent
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.widget.RemoteViews
 import com.poqi.music.MusicFlow.R
-import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetPlugin
+import es.antonborri.home_widget.HomeWidgetBackgroundReceiver
 import java.io.File
-import android.net.Uri
 
 class MusicWidgetProvider : AppWidgetProvider() {
+
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
 
@@ -46,27 +49,25 @@ class MusicWidgetProvider : AppWidgetProvider() {
                 if (isLiked) R.drawable.liked else R.drawable.like
             )
 
-            views.setOnClickPendingIntent(
-    R.id.btn_play_pause,
-    HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java, Uri.parse("myAppWidget://toggle"))
-)
-
-views.setOnClickPendingIntent(
-    R.id.btn_next,
-    HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java, Uri.parse("myAppWidget://next"))
-)
-
-views.setOnClickPendingIntent(
-    R.id.btn_previous,
-    HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java, Uri.parse("myAppWidget://prev"))
-)
-
-views.setOnClickPendingIntent(
-    R.id.btn_like,
-    HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java, Uri.parse("myAppWidget://like"))
-)
+            // دکمه‌ها با PendingIntent که به MainActivity می‌روند
+            views.setOnClickPendingIntent(R.id.btn_play_pause, getPendingIntent(context, "myAppWidget://play_pause"))
+            views.setOnClickPendingIntent(R.id.btn_next, getPendingIntent(context, "myAppWidget://next"))
+            views.setOnClickPendingIntent(R.id.btn_previous, getPendingIntent(context, "myAppWidget://previous"))
+            views.setOnClickPendingIntent(R.id.btn_like, getPendingIntent(context, "myAppWidget://like"))
 
             appWidgetManager.updateAppWidget(widgetId, views)
         }
+    }
+
+    private fun getPendingIntent(context: Context, uri: String): PendingIntent {
+        val intent = Intent(context, HomeWidgetBackgroundReceiver::class.java).apply {
+            this.data = Uri.parse(uri)
+        }
+        return PendingIntent.getBroadcast(
+            context,
+            uri.hashCode(),  // برای یکتا بودن
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
     }
 }

@@ -43,7 +43,7 @@ class HomeScreen extends StatelessWidget {
     return GetBuilder<HomeController>(builder: (hController) {
       return Scaffold(
         key: _key,
-        floatingActionButton: hController.selectedFilter == 'Playlist'
+        floatingActionButton: hController.selectedFilter == 't20'
             ? FloatingActionButton(
                 onPressed: () {
                   TextEditingController textEditingController =
@@ -67,19 +67,8 @@ class HomeScreen extends StatelessWidget {
                             TextButton(
                                 onPressed: () async {
                                   try {
-                                    final OnAudioQuery audioQuery =
-                                        OnAudioQuery();
-                                    bool status =
-                                        await audioQuery.createPlaylist(
-                                            textEditingController.text);
-                                    if (status) {
-                                      kShowToast('Playlist Created');
-                                      Get.back();
-                                      hController.resetPlaylists();
-                                    } else {
-                                      kShowToast('error');
-                                      Get.back();
-                                    }
+                                    controller.createPlayList(
+                                        title: textEditingController.text);
                                   } catch (e) {
                                     kShowToast('error');
                                     Get.back();

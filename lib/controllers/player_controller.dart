@@ -147,6 +147,7 @@ class PlayerController extends GetxController {
             await stream2!.cancel();
           }
           stream2 = player.playingStream.listen((plEvent) async {
+            setWidgetData(index: player.currentIndex, playing: plEvent);
             // updateMusicWidget()
             if (stream3 != null) {
               await stream3!.cancel();
@@ -197,18 +198,32 @@ class PlayerController extends GetxController {
     });
   }
 
+  setWidgetData({required int? index, required bool playing}) {
+    final sequence = player.sequence;
+    if (sequence != null && index != null) {
+      final currentSource = sequence[index];
+      final mediaItem = currentSource.tag as MediaItem;
+      updateMusicWidget(
+          title: mediaItem.title,
+          artist: mediaItem.artist ?? 'Unknown Artist',
+          imagePath: mediaItem.artUri?.path,
+          isPlaying: playing,
+          isLiked: false);
+    }
+  }
+
   Future<void> updateMusicWidget({
     required String title,
     required String artist,
-    required String imagePath,
+    required String? imagePath,
     required bool isPlaying,
     required bool isLiked,
   }) async {
-    await HomeWidget.saveWidgetData<String>('song_title', title);
-    await HomeWidget.saveWidgetData<String>('song_artist', artist);
-    await HomeWidget.saveWidgetData<String>('song_image', imagePath);
-    await HomeWidget.saveWidgetData<bool>('is_playing', isPlaying);
-    await HomeWidget.saveWidgetData<bool>('is_liked', isLiked);
+    await HomeWidget.saveWidgetData<String>('title', title);
+    await HomeWidget.saveWidgetData<String>('artist', artist);
+    await HomeWidget.saveWidgetData<String>('image', imagePath);
+    await HomeWidget.saveWidgetData<bool>('isPlaying', isPlaying);
+    await HomeWidget.saveWidgetData<bool>('isLiked', isLiked);
     await HomeWidget.updateWidget(
         name: 'MusicWidgetProvider', iOSName: 'MusicWidget');
   }

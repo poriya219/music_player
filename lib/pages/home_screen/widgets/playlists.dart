@@ -11,7 +11,7 @@ import '../controller/home_controller.dart';
 import 'list_detail.dart';
 
 class Playlists extends StatelessWidget {
-  final List<PlaylistModel> playlists;
+  final List playlists;
   Playlists({super.key, required this.playlists});
 
   final controller = Get.put(AppController());
@@ -34,7 +34,7 @@ class Playlists extends StatelessWidget {
     );
   }
 
-  Widget playlistCard({required PlaylistModel playlist}) {
+  Widget playlistCard({required Map playlist}) {
     return GestureDetector(
       onTap: () {
         Get.to(() => ListDetail(
@@ -74,7 +74,7 @@ class Playlists extends StatelessWidget {
             width: 40.w,
             height: 40.w,
             child: FutureBuilder(
-                future: controller.getPlaylistImage(playlist.id),
+                future: controller.getPlaylistImage(0),
                 builder: (context, AsyncSnapshot snapshot) {
                   if (snapshot.connectionState == ConnectionState.done &&
                       snapshot.hasData) {
@@ -122,18 +122,9 @@ class Playlists extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  playlist.playlist,
+                  playlist['title'],
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(
-                  height: 0.2.h,
-                ),
-                Text(
-                  'Total ${playlist.numOfSongs} songs',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: kTextGreyColor),
                 ),
               ],
             ),
