@@ -1,13 +1,16 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:MusicFlow/controllers/audio_service_singleton.dart';
+import 'package:MusicFlow/controllers/player_service.dart';
 import 'package:MusicFlow/pages/equalizer/equalizer_screen.dart';
 import 'package:MusicFlow/pages/find_screen/find_song_screen.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:MusicFlow/constans.dart';
 import 'package:MusicFlow/controllers/app_controller.dart';
 import 'package:MusicFlow/controllers/player_controller.dart';
@@ -18,6 +21,7 @@ import 'package:MusicFlow/pages/home_screen/widgets/list_detail.dart';
 import 'package:MusicFlow/pages/home_screen/widgets/playlists.dart';
 import 'package:MusicFlow/pages/home_screen/widgets/songs_list.dart';
 import 'package:MusicFlow/pages/search_screen/search_screen.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:on_audio_query_forked/on_audio_query.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -281,274 +285,227 @@ class HomeScreen extends StatelessWidget {
               )),
         ),
         bottomNavigationBar: StreamBuilder(
-            stream: playerController.player.playingStream,
+            stream: AudioServiceSingleton().handler.playbackState,
             builder: (context, AsyncSnapshot pSnapshot) {
-              bool isPlaying = pSnapshot.data ?? false;
               return StreamBuilder(
-                  stream: playerController.player.currentIndexStream,
-                  builder: (context, AsyncSnapshot iSnapshot) {
-                    int cIndex = iSnapshot.data ?? 0;
-                    return StreamBuilder(
-                        stream: playerController.player.sequenceStream,
-                        builder: (context, AsyncSnapshot snapshot) {
-                          List<IndexedAudioSource> list =
-                              snapshot.data ?? <IndexedAudioSource>[];
-                          if (snapshot.data == null) {
-                            return const SizedBox();
+                  stream: AudioServiceSingleton().handler.mediaItem,
+                  builder: (context, AsyncSnapshot snapshot) {
+                    // if (snapshot.data == null) {
+                    //   return const SizedBox();
+                    // }
+                    PlaybackState playbackState = pSnapshot.data;
+                    MediaItem? mediaItem = snapshot.data;
+                    // QueryArtworkWidget artwork = mediaItem == null
+                    //     ? const QueryArtworkWidget(
+                    //         id: 0, type: ArtworkType.AUDIO)
+                    //     : QueryArtworkWidget(
+                    //         artworkBorder: BorderRadius.circular(20),
+                    //         artworkQuality: FilterQuality.high,
+                    //         size: 5000,
+                    //         quality: 100,
+                    //         format: ArtworkFormat.JPEG,
+                    //         id: int.parse(mediaItem.id),
+                    //         type: ArtworkType.AUDIO);
+                    String songTitle =
+                        mediaItem == null ? 'Unknown' : mediaItem.title;
+                    String songArtist = mediaItem == null
+                        ? 'Unknown'
+                        : mediaItem.artist ?? 'Unknown';
+                    return WidgetSlider(
+                        // itemCount: list.isEmpty ? 1 : list.length,
+                        itemCount: 3,
+                        proximity: 1,
+                        fixedSize: 9.h,
+                        controller: appController.sliderController,
+                        onMove: (i) {
+                          if (!appController.isSeeking) {
+                            appController.seekSliderController(1);
+                            if (i == 2) {
+                              AudioServiceSingleton().handler.skipToNext();
+                            } else if (i == 0) {
+                              AudioServiceSingleton().handler.skipToPrevious();
+                            }
                           }
-                          QueryArtworkWidget artwork = list.isEmpty
-                              ? const QueryArtworkWidget(
-                                  id: 0, type: ArtworkType.AUDIO)
-                              : QueryArtworkWidget(
-                                  artworkBorder: BorderRadius.circular(20),
-                                  artworkQuality: FilterQuality.high,
-                                  size: 5000,
-                                  quality: 100,
-                                  format: ArtworkFormat.JPEG,
-                                  id: int.parse(list[cIndex].tag.id),
-                                  type: ArtworkType.AUDIO);
-                          String songTitle =
-                              list.isEmpty ? 'Unknown' : list[cIndex].tag.title;
-                          String songArtist = list.isEmpty
-                              ? 'Unknown'
-                              : list[cIndex].tag.artist;
-                          return WidgetSlider(
-                              // itemCount: list.isEmpty ? 1 : list.length,
-                              itemCount: 3,
-                              proximity: 1,
-                              fixedSize: 9.h,
-                              controller: appController.sliderController,
-                              onMove: (i) {
-                                if (!appController.isSeeking) {
-                                  appController.seekSliderController(1);
-                                  if (i == 2) {
-                                    playerController.player.seekToNext();
-                                  } else if (i == 0) {
-                                    playerController.player.seekToPrevious();
-                                  }
-                                }
-                              },
-                              transformCurve: const ElasticOutCurve(),
-                              sizeDistinction: 0.99,
-                              itemBuilder: (context, index, activeIndex) {
-                                // appController.seekSliderController(cIndex);
-                                return GestureDetector(
-                                  onTap: () {
-                                    Get.to(() => PlaySongScreen());
-                                  },
-                                  child: Directionality(
-                                    textDirection: TextDirection.ltr,
-                                    child: Container(
-                                      decoration: const BoxDecoration(
-                                        color: Colors.transparent,
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Color(0xFF7B7C7D),
-                                            offset: Offset(5, -76),
-                                            blurRadius: 4,
-                                            spreadRadius: 0,
-                                          ),
-                                        ],
-                                      ),
-                                      height: 9.h,
-                                      child: Stack(
-                                        alignment: Alignment.bottomCenter,
+                        },
+                        transformCurve: const ElasticOutCurve(),
+                        sizeDistinction: 0.99,
+                        itemBuilder: (context, index, activeIndex) {
+                          // appController.seekSliderController(cIndex);
+                          return GestureDetector(
+                            onTap: () {
+                              Get.to(() => PlaySongScreen());
+                            },
+                            child: Directionality(
+                              textDirection: TextDirection.ltr,
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                  color: Colors.transparent,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xFF7B7C7D),
+                                      offset: Offset(5, -76),
+                                      blurRadius: 4,
+                                      spreadRadius: 0,
+                                    ),
+                                  ],
+                                ),
+                                height: 9.h,
+                                child: Stack(
+                                  alignment: Alignment.bottomCenter,
+                                  children: [
+                                    Container(
+                                      width: 100.w,
+                                      height: 7.h,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          Container(
-                                            width: 100.w,
-                                            height: 7.h,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                SizedBox(
-                                                  width: 22.w,
+                                          SizedBox(
+                                            width: 22.w,
+                                          ),
+                                          Expanded(
+                                              child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                songTitle,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontSize: 16.sp,
+                                                  fontWeight: FontWeight.bold,
                                                 ),
-                                                Expanded(
-                                                    child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
+                                              ),
+                                              Text(
+                                                songArtist,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontSize: 16.sp,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: kTextGreyColor,
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 0.5.h,
+                                              ),
+                                            ],
+                                          )),
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 3),
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Stack(
+                                                  alignment: Alignment.center,
                                                   children: [
-                                                    Text(
-                                                      songTitle,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: TextStyle(
-                                                        fontSize: 16.sp,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
+                                                    CircularProgressIndicator(
+                                                      value: (playbackState
+                                                                      .position
+                                                                      .inSeconds /
+                                                                  (mediaItem == null
+                                                                          ? Duration
+                                                                              .zero
+                                                                          : mediaItem.duration ??
+                                                                              Duration
+                                                                                  .zero)
+                                                                      .inSeconds)
+                                                              .isFinite
+                                                          ? playbackState
+                                                                  .position
+                                                                  .inSeconds /
+                                                              (mediaItem == null
+                                                                      ? Duration
+                                                                          .zero
+                                                                      : mediaItem
+                                                                              .duration ??
+                                                                          Duration
+                                                                              .zero)
+                                                                  .inSeconds
+                                                          : 0,
+                                                      color: kBlueColor,
+                                                      strokeWidth: 3,
+                                                      backgroundColor:
+                                                          const Color(
+                                                              0xFFCCCCCC),
                                                     ),
-                                                    Text(
-                                                      songArtist,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: TextStyle(
-                                                        fontSize: 16.sp,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: kTextGreyColor,
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        if (playbackState
+                                                            .playing) {
+                                                          AudioServiceSingleton()
+                                                              .handler
+                                                              .stop();
+                                                        } else {
+                                                          AudioServiceSingleton()
+                                                              .handler
+                                                              .play();
+                                                        }
+                                                      },
+                                                      child: Icon(
+                                                        playbackState.playing
+                                                            ? Icons.pause
+                                                            : Icons.play_arrow,
+                                                        color: Theme.of(context)
+                                                            .iconTheme
+                                                            .color,
+                                                        size: 8.w,
                                                       ),
-                                                    ),
-                                                    SizedBox(
-                                                      height: 0.5.h,
                                                     ),
                                                   ],
-                                                )),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          top: 3),
-                                                  child: Row(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Stack(
-                                                        alignment:
-                                                            Alignment.center,
-                                                        children: [
-                                                          StreamBuilder(
-                                                              stream: playerController
-                                                                  .player
-                                                                  .durationStream,
-                                                              builder: (context,
-                                                                  AsyncSnapshot
-                                                                      dSnapshot) {
-                                                                return StreamBuilder(
-                                                                    stream: playerController
-                                                                        .player
-                                                                        .positionStream,
-                                                                    builder: (context,
-                                                                        AsyncSnapshot
-                                                                            pSnapshot) {
-                                                                      if (pSnapshot
-                                                                              .hasData &&
-                                                                          dSnapshot
-                                                                              .hasData) {
-                                                                        Duration
-                                                                            duration =
-                                                                            dSnapshot.data ??
-                                                                                const Duration(seconds: 1);
-                                                                        Duration
-                                                                            position =
-                                                                            pSnapshot.data ??
-                                                                                Duration.zero;
-                                                                        return CircularProgressIndicator(
-                                                                          value:
-                                                                              position.inSeconds / duration.inSeconds,
-                                                                          color:
-                                                                              kBlueColor,
-                                                                          strokeWidth:
-                                                                              3,
-                                                                          backgroundColor:
-                                                                              const Color(0xFFCCCCCC),
-                                                                        );
-                                                                      } else {
-                                                                        return const SizedBox();
-                                                                      }
-                                                                    });
-                                                              }),
-                                                          GestureDetector(
-                                                            onTap: () {
-                                                              if (isPlaying) {
-                                                                playerController
-                                                                    .player
-                                                                    .stop();
-                                                              } else {
-                                                                playerController
-                                                                    .player
-                                                                    .play();
-                                                              }
-                                                            },
-                                                            child: Icon(
-                                                              isPlaying
-                                                                  ? Icons.pause
-                                                                  : Icons
-                                                                      .play_arrow,
-                                                              color: Theme.of(
-                                                                      context)
-                                                                  .iconTheme
-                                                                  .color,
-                                                              size: 8.w,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      SizedBox(
-                                                        width: 7.w,
-                                                      ),
-                                                      GestureDetector(
-                                                        onTap: () {
-                                                          playerController
-                                                              .player
-                                                              .seekToNext();
-                                                        },
-                                                        child: Icon(
-                                                          EvaIcons.skipForward,
-                                                          color: kTextGreyColor,
-                                                          size: 7.w,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
                                                 ),
                                                 SizedBox(
-                                                  width: 5.w,
+                                                  width: 7.w,
+                                                ),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    AudioServiceSingleton()
+                                                        .handler
+                                                        .skipToNext();
+                                                  },
+                                                  child: Icon(
+                                                    EvaIcons.skipForward,
+                                                    color: kTextGreyColor,
+                                                    size: 7.w,
+                                                  ),
                                                 ),
                                               ],
                                             ),
                                           ),
-                                          Positioned(
-                                              left: 4.w,
-                                              bottom: 1.5.h,
-                                              child: controller
-                                                      .isGrantedPermission
-                                                  ? FutureBuilder(
-                                                      future: appController
-                                                          .getSongImage(
-                                                              artwork.id),
-                                                      builder: (context,
-                                                          AsyncSnapshot
-                                                              fSnapshot) {
-                                                        if (fSnapshot.hasData &&
-                                                            fSnapshot
-                                                                    .connectionState ==
-                                                                ConnectionState
-                                                                    .done) {
-                                                          Uint8List data =
-                                                              fSnapshot.data;
-                                                          return CircleAvatar(
-                                                              radius: 7.w,
-                                                              foregroundColor:
-                                                                  kBlueColor,
-                                                              backgroundColor:
-                                                                  kBlueColor,
-                                                              foregroundImage:
-                                                                  MemoryImage(
-                                                                      data));
-                                                        } else {
-                                                          return SizedBox();
-                                                        }
-                                                      })
-                                                  : CircleAvatar(
-                                                      radius: 7.w,
-                                                      foregroundColor:
-                                                          kBlueColor,
-                                                      backgroundColor:
-                                                          kBlueColor,
-                                                    )),
+                                          SizedBox(
+                                            width: 5.w,
+                                          ),
                                         ],
                                       ),
                                     ),
-                                  ),
-                                );
-                              });
+                                    Positioned(
+                                        left: 4.w,
+                                        bottom: 1.5.h,
+                                        child: controller.isGrantedPermission
+                                            ? CircleAvatar(
+                                                radius: 7.w,
+                                                foregroundColor: kBlueColor,
+                                                backgroundColor: kBlueColor,
+                                                foregroundImage: FileImage(File(
+                                                    mediaItem == null
+                                                        ? ''
+                                                        : mediaItem
+                                                            .artUri!.path)))
+                                            : CircleAvatar(
+                                                radius: 7.w,
+                                                foregroundColor: kBlueColor,
+                                                backgroundColor: kBlueColor,
+                                              )),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
                         });
                   });
             }),

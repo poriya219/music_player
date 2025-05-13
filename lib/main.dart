@@ -1,13 +1,13 @@
 import 'package:MusicFlow/controllers/analytics.dart';
-import 'package:MusicFlow/controllers/player_controller.dart';
+import 'package:MusicFlow/controllers/audio_service_singleton.dart';
 import 'package:MusicFlow/firebase_options.dart';
 import 'package:MusicFlow/translations/translation.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:just_audio_background/just_audio_background.dart';
 import 'package:MusicFlow/constans.dart';
 import 'package:MusicFlow/pages/home_screen/home_screen.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -21,11 +21,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await JustAudioBackground.init(
-    androidNotificationChannelId: 'play_channel_group',
-    androidNotificationChannelName: 'play channel',
-    androidNotificationOngoing: true,
-  );
+  await AudioServiceSingleton().init();
   await Translator.initLanguages();
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -126,25 +122,34 @@ class MyApp extends StatelessWidget {
   }
 }
 
+@pragma('vm:entry-point')
 Future<void> backgroundCallback(Uri? uri) async {
+  AudioHandler proxyAudioHandler = await IsolatedAudioHandler.lookup(
+    portName: 'my_audio_handler',
+  );
   print('action: ${uri?.host}');
-  final playerController = Get.put(PlayerController());
   switch (uri?.host) {
     case 'play_pause':
-      if (playerController.player.playing) {
-        playerController.player.pause();
+      PlaybackState playbackState =
+          await AudioServiceSingleton().handler.playbackState.last;
+      bool playing = playbackState.playing;
+      if (playing) {
+        proxyAudioHandler.pause();
+        await HomeWidget.saveWidgetData<bool>('isPlaying', false);
       } else {
-        playerController.player.play();
+        proxyAudioHandler.play();
+        await HomeWidget.saveWidgetData<bool>('isPlaying', true);
       }
       break;
     case 'next':
-      // next track
+      proxyAudioHandler.skipToNext();
       break;
     case 'previous':
-      // previous track
+      proxyAudioHandler.skipToPrevious();
       break;
     case 'like':
       // toggle like
+      await HomeWidget.saveWidgetData<bool>('isLiked', true);
       break;
   }
 }

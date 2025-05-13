@@ -1,5 +1,8 @@
-import 'package:MusicFlow/controllers/player_controller.dart';
+import 'package:MusicFlow/controllers/audio_service_singleton.dart';
+import 'package:MusicFlow/controllers/player_service.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:get/get.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'equalizer_controller.dart';
 
@@ -19,8 +22,9 @@ class EqualizerUiController extends GetxController {
   var enabled = false.obs;
 
   Future<void> init() async {
-    final playerController = Get.put(PlayerController());
-    int? sessionId = playerController.player.androidAudioSessionId;
+    AndroidPlaybackInfo androidPlaybackInfo =
+        await AudioServiceSingleton().handler.androidPlaybackInfo.last;
+    int? sessionId = null;
     if (sessionId == null) {
       return;
     }

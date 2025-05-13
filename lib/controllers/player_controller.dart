@@ -4,11 +4,13 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:MusicFlow/controllers/ad_controller.dart';
+import 'package:MusicFlow/controllers/audio_service_singleton.dart';
+import 'package:MusicFlow/controllers/player_service.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:get/get.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_background/just_audio_background.dart';
 import 'package:MusicFlow/controllers/app_controller.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:on_audio_query_forked/on_audio_query.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,16 +26,17 @@ class PlayerController extends GetxController {
   }
 
   songListeningStream() {
-    player.currentIndexStream.listen((event) async {
+    AudioServiceSingleton().handler.mediaItem.listen((MediaItem? event) async {
       if (event != null) {
         Timer(const Duration(seconds: 1), () {
           StreamSubscription? pStream;
-          pStream = player.positionStream.listen((pEvent) async {
-            int duration = pEvent.inSeconds;
+          pStream = AudioServiceSingleton()
+              .handler
+              .playbackState
+              .listen((PlaybackState pEvent) async {
+            int duration = pEvent.position.inSeconds;
             if (duration == 7) {
-              List<IndexedAudioSource> list =
-                  player.sequence ?? <IndexedAudioSource>[];
-              String songTitle = list[event].tag.title;
+              String songTitle = event.title;
               int? id;
               final homeController = Get.find<HomeController>();
               for (var each in homeController.songs) {
@@ -66,14 +69,12 @@ class PlayerController extends GetxController {
     update();
   }
 
-  final player = AudioPlayer();
-
-  ConcatenatingAudioSource playlist =
-      ConcatenatingAudioSource(children: [], useLazyPreparation: true);
-  resetPlayList() {
-    playlist = ConcatenatingAudioSource(children: []);
-    update();
-  }
+  // ConcatenatingAudioSource playlist =
+  //     ConcatenatingAudioSource(children: [], useLazyPreparation: true);
+  // resetPlayList() {
+  //   playlist = ConcatenatingAudioSource(children: []);
+  //   update();
+  // }
 
   int currentIndex = 0;
   setCurrentIndex(int value) {
@@ -92,6 +93,8 @@ class PlayerController extends GetxController {
     }
   }
 
+  List<MediaItem> queueList = [];
+
   sourceListGetter(
       {required List<SongModel> list, required int index, bool? play}) async {
     Directory tempDir = await getApplicationDocumentsDirectory();
@@ -100,73 +103,82 @@ class PlayerController extends GetxController {
       // print('playlist: ${playlist.toString()}');
       // String temp = jsonEncode(list);
       // print('json list: $list');
-      resetPlayList();
+      // resetPlayList();
+      AudioServiceSingleton().handler.updateQueue([]);
+      queueList.clear();
+      queueList = [];
       setCurrentIndex(index);
       List listToSave = [];
       for (var each in list) {
         var filePath = '$tempPath/file_${each.id}.png';
-        playlist.add(
-          AudioSource.uri(
-            Uri.file(each.data),
-            tag: MediaItem(
-              id: each.id.toString(),
-              title: each.title,
-              album: each.album,
-              artist: each.artist,
-              artUri: File(filePath).uri,
-            ),
-          ),
-        );
+        queueList.add(MediaItem(
+          id: each.uri ?? '',
+          title: each.title,
+          album: each.album,
+          artist: each.artist,
+          artUri: File(filePath).uri,
+        ));
         listToSave.add(each.getMap);
       }
-      player.setAudioSource(playlist, initialIndex: index);
+      AudioServiceSingleton().handler.updateQueue(queueList);
+      AudioServiceSingleton().handler.skipToQueueItem(index);
       if (play != false) {
         final prefs = await SharedPreferences.getInstance();
         prefs.setString('last_play_list', jsonEncode(listToSave));
         prefs.setInt('last_play_index', index);
-        player.play().then((value) {
+        AudioServiceSingleton().handler.play().then((value) {
           final appController = Get.find<AppController>();
 
           appController.seekSliderController(1);
         });
+        PlaybackState item =
+            await AudioServiceSingleton().handler.playbackState.first;
+        print('item: ${item.playing}');
 
         StreamSubscription? stream1;
-        StreamSubscription? stream2;
-        StreamSubscription? stream3;
+        // StreamSubscription? stream2;
+        // StreamSubscription? stream3;
         if (stream1 != null) {
           await stream1.cancel();
         }
-        stream1 = player.currentIndexStream.listen((event) async {
-          setCurrentIndex(player.currentIndex ?? 0);
+        stream1 = AudioServiceSingleton()
+            .handler
+            .playbackState
+            .listen((PlaybackState event) async {
+          setCurrentIndex(event.queueIndex ?? 0);
           // updateMusicWidget()
           final prefs = await SharedPreferences.getInstance();
-          prefs.setInt('last_play_index', player.currentIndex ?? 0);
+          prefs.setInt('last_play_index', event.queueIndex ?? 0);
+          setWidgetData(playing: event.playing);
           // String title = player.sequence![player.currentIndex ?? 0].tag.title;
           // String artist = player.sequence![player.currentIndex ?? 0].tag.artist;
-          if (stream2 != null) {
-            await stream2!.cancel();
-          }
-          stream2 = player.playingStream.listen((plEvent) async {
-            setWidgetData(index: player.currentIndex, playing: plEvent);
-            // updateMusicWidget()
-            if (stream3 != null) {
-              await stream3!.cancel();
-            }
-            stream3 = player.durationStream.listen((dEvent) async {});
-          });
+          // if (stream2 != null) {
+          //   await stream2!.cancel();
+          // }
+          // stream2 =
+          //     AudioServiceSingleton().isPlayingStream.listen((plEvent) async {
+          //   setWidgetData(index: event.queueIndex, playing: plEvent);
+          //   // updateMusicWidget()
+          //   if (stream3 != null) {
+          //     await stream3!.cancel();
+          //   }
+          //   stream3 = AudioServiceSingleton()
+          //       .durationStream
+          //       .listen((dEvent) async {});
+          // });
         });
       }
     }
   }
 
-  initialPlay({required String path}) async {
-    if (isPlaying) {
-      await player.stop();
-    }
-    await player.setAudioSource(AudioSource.file(path));
-    setIsPlaying(true);
-    await player.play();
-  }
+  // initialPlay({required String path}) async {
+  //   if (isPlaying) {
+  //     await AudioServiceSingleton().handler.stop();
+  //   }
+  //   await AudioServiceSingleton().setAudioSource(AudioSource.file(path));
+  //   setIsPlaying(true);
+  //   await AudioServiceSingleton().handler.play();
+  // }
 
   listenToMessages(ReceivePort receivePort) {
     receivePort.listen((dynamic message) {
@@ -198,11 +210,9 @@ class PlayerController extends GetxController {
     });
   }
 
-  setWidgetData({required int? index, required bool playing}) {
-    final sequence = player.sequence;
-    if (sequence != null && index != null) {
-      final currentSource = sequence[index];
-      final mediaItem = currentSource.tag as MediaItem;
+  setWidgetData({required bool playing}) async {
+    MediaItem? mediaItem = await AudioServiceSingleton().handler.mediaItem.last;
+    if (mediaItem != null) {
       updateMusicWidget(
           title: mediaItem.title,
           artist: mediaItem.artist ?? 'Unknown Artist',

@@ -1,24 +1,27 @@
 import 'package:MusicFlow/constans.dart';
+import 'package:MusicFlow/controllers/audio_service_singleton.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class PlaySlider extends StatelessWidget {
-  final AudioPlayer player;
-  const PlaySlider({super.key, required this.player});
+  PlaySlider({super.key});
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: player.durationStream,
+        stream: AudioServiceSingleton().handler.mediaItem,
         builder: (context, AsyncSnapshot dSnapshot) {
-          Duration duration = dSnapshot.data ?? Duration.zero;
+          final MediaItem? mediaItem = dSnapshot.data;
+          Duration duration = mediaItem == null
+              ? Duration.zero
+              : mediaItem.duration ?? Duration.zero;
           return StreamBuilder(
-              stream: player.positionStream,
+              stream: AudioServiceSingleton().handler.playbackState,
               builder: (context, AsyncSnapshot pSnapshot) {
-                Duration position = pSnapshot.data ?? Duration.zero;
+                final PlaybackState playbackState = pSnapshot.data;
+                Duration position = playbackState.position;
                 return Column(
                   children: [
                     Slider(
@@ -29,7 +32,9 @@ class PlaySlider extends StatelessWidget {
                       inactiveColor: kTextGreyColor,
                       value: position.inSeconds.toDouble(),
                       onChanged: (value) {
-                        player.seek(Duration(seconds: value.toInt()));
+                        AudioServiceSingleton()
+                            .handler
+                            .seek(Duration(seconds: value.toInt()));
                       },
                       max: duration.inSeconds.toDouble(),
                     ),

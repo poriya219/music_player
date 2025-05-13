@@ -1,6 +1,9 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:MusicFlow/controllers/audio_service_singleton.dart';
+import 'package:MusicFlow/controllers/player_service.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
@@ -146,8 +149,9 @@ class ListDetail extends StatelessWidget {
                               int index = list.length > 1
                                   ? random.nextInt(list.length - 1)
                                   : 1;
-                              playerController.player
-                                  .setShuffleModeEnabled(true);
+                              AudioServiceSingleton()
+                                  .handler
+                                  .setShuffleMode(AudioServiceShuffleMode.all);
                               Get.to(() => PlaySongScreen());
                               playerController.sourceListGetter(
                                   list: list, index: index);

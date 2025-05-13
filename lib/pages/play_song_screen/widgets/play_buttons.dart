@@ -1,12 +1,13 @@
 import 'dart:convert';
 
 import 'package:MusicFlow/constans.dart';
+import 'package:MusicFlow/controllers/audio_service_singleton.dart';
 import 'package:MusicFlow/controllers/player_controller.dart';
 import 'package:MusicFlow/pages/home_screen/controller/home_controller.dart';
 import 'package:MusicFlow/pages/play_song_screen/widgets/play_slider.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:on_audio_query_forked/on_audio_query.dart';
@@ -14,14 +15,9 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PlayButtons extends StatelessWidget {
-  final AudioPlayer player;
   final QueryArtworkWidget artwork;
   final String songTitle;
-  PlayButtons(
-      {super.key,
-      required this.player,
-      required this.artwork,
-      required this.songTitle});
+  PlayButtons({super.key, required this.artwork, required this.songTitle});
 
   final pController = Get.find<PlayerController>();
 
@@ -83,7 +79,7 @@ class PlayButtons extends StatelessWidget {
           SizedBox(
             height: 1.h,
           ),
-          PlaySlider(player: player),
+          PlaySlider(),
           SizedBox(
             height: 2.h,
           ),
@@ -91,16 +87,24 @@ class PlayButtons extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               StreamBuilder(
-                  stream: player.shuffleModeEnabledStream,
+                  stream: AudioServiceSingleton().handler.playbackState,
                   builder: (context, AsyncSnapshot shuffleSnapshot) {
                     if (shuffleSnapshot.hasData) {
-                      bool isShuffle = shuffleSnapshot.data ?? false;
+                      PlaybackState playbackState = shuffleSnapshot.data;
+                      bool isShuffle = playbackState.shuffleMode ==
+                              AudioServiceShuffleMode.none
+                          ? false
+                          : true;
                       return GestureDetector(
                         onTap: () {
                           if (isShuffle) {
-                            player.setShuffleModeEnabled(false);
+                            AudioServiceSingleton()
+                                .handler
+                                .setShuffleMode(AudioServiceShuffleMode.none);
                           } else {
-                            player.setShuffleModeEnabled(true);
+                            AudioServiceSingleton()
+                                .handler
+                                .setShuffleMode(AudioServiceShuffleMode.all);
                           }
                         },
                         child: Icon(
@@ -113,7 +117,9 @@ class PlayButtons extends StatelessWidget {
                     } else {
                       return GestureDetector(
                         onTap: () {
-                          player.setShuffleModeEnabled(true);
+                          AudioServiceSingleton()
+                              .handler
+                              .setShuffleMode(AudioServiceShuffleMode.all);
                         },
                         child: Icon(
                           EvaIcons.shuffle2,
@@ -128,7 +134,7 @@ class PlayButtons extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: () {
-                  player.seekToPrevious();
+                  AudioServiceSingleton().handler.skipToPrevious();
                 },
                 child: Icon(
                   EvaIcons.skipBack,
@@ -140,21 +146,25 @@ class PlayButtons extends StatelessWidget {
                 width: 4.w,
               ),
               GestureDetector(
-                onTap: () {
-                  if (player.playing) {
-                    player.pause();
+                onTap: () async {
+                  PlaybackState playbackState =
+                      await AudioServiceSingleton().handler.playbackState.last;
+                  bool playing = playbackState.playing;
+                  if (playing) {
+                    AudioServiceSingleton().handler.pause();
                   } else {
-                    player.play();
+                    AudioServiceSingleton().handler.play();
                   }
                 },
                 child: CircleAvatar(
                   radius: 9.w,
                   backgroundColor: kBlueColor,
                   child: StreamBuilder(
-                      stream: player.playingStream,
+                      stream: AudioServiceSingleton().handler.playbackState,
                       builder: (context, AsyncSnapshot pSnapshot) {
                         if (pSnapshot.hasData) {
-                          bool isPlaying = pSnapshot.data;
+                          PlaybackState playbackState = pSnapshot.data;
+                          bool isPlaying = playbackState.playing;
                           return Icon(
                             isPlaying ? Icons.pause : Icons.play_arrow,
                             size: 10.w,
@@ -171,7 +181,7 @@ class PlayButtons extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: () {
-                  player.seekToNext();
+                  AudioServiceSingleton().handler.skipToNext();
                 },
                 child: Icon(
                   EvaIcons.skipForward,
@@ -183,28 +193,37 @@ class PlayButtons extends StatelessWidget {
                 width: 4.w,
               ),
               StreamBuilder(
-                  stream: player.loopModeStream,
+                  stream: AudioServiceSingleton().handler.playbackState,
                   builder: (context, AsyncSnapshot loopSnapshot) {
                     if (loopSnapshot.hasData) {
-                      LoopMode loopMode = loopSnapshot.data;
+                      PlaybackState playbackState = loopSnapshot.data;
+                      AudioServiceRepeatMode repeatMode =
+                          playbackState.repeatMode;
                       return GestureDetector(
                         onTap: () {
-                          if (loopMode == LoopMode.off) {
-                            player.setLoopMode(LoopMode.all);
-                          } else if (loopMode == LoopMode.all) {
-                            player.setLoopMode(LoopMode.one);
+                          if (repeatMode == AudioServiceRepeatMode.none) {
+                            AudioServiceSingleton()
+                                .handler
+                                .setRepeatMode(AudioServiceRepeatMode.all);
+                          } else if (repeatMode == AudioServiceRepeatMode.all) {
+                            AudioServiceSingleton()
+                                .handler
+                                .setRepeatMode(AudioServiceRepeatMode.one);
                           } else {
-                            player.setLoopMode(LoopMode.off);
+                            AudioServiceSingleton()
+                                .handler
+                                .setRepeatMode(AudioServiceRepeatMode.none);
                           }
                         },
-                        child: loopMode == LoopMode.one
+                        child: repeatMode == AudioServiceRepeatMode.one
                             ? Stack(
                                 alignment: Alignment.topRight,
                                 children: [
                                   Icon(
                                     EvaIcons.repeat,
                                     size: 10.w,
-                                    color: loopMode == LoopMode.off
+                                    color: repeatMode ==
+                                            AudioServiceRepeatMode.none
                                         ? Get.theme.primaryColor
                                         : kBlueColor,
                                   ),
@@ -223,11 +242,11 @@ class PlayButtons extends StatelessWidget {
                                 ],
                               )
                             : Icon(
-                                loopMode == LoopMode.one
+                                repeatMode == AudioServiceRepeatMode.one
                                     ? EvaIcons.repeat
                                     : EvaIcons.repeat,
                                 size: 8.w,
-                                color: loopMode == LoopMode.off
+                                color: repeatMode == AudioServiceRepeatMode.none
                                     ? Get.theme.primaryColor
                                     : kBlueColor,
                               ),
