@@ -17,11 +17,12 @@ class PlaySlider extends StatelessWidget {
           Duration duration = mediaItem == null
               ? Duration.zero
               : mediaItem.duration ?? Duration.zero;
+          print('duration: ${duration.inSeconds}');
           return StreamBuilder(
-              stream: AudioServiceSingleton().handler.playbackState,
+              stream: AudioServiceSingleton().handler.customState,
               builder: (context, AsyncSnapshot pSnapshot) {
-                final PlaybackState playbackState = pSnapshot.data;
-                Duration position = playbackState.position;
+                final posMs = pSnapshot.data?['position'] ?? 0;
+                final Duration position = Duration(milliseconds: posMs);
                 return Column(
                   children: [
                     Slider(

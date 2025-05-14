@@ -142,6 +142,7 @@ class HomeController extends GetxController {
           each,
           ArtworkType.AUDIO,
           quality: 100,
+          size: 5000,
         );
         await File(filePath).writeAsBytes(data ?? defaultData);
       }

@@ -15,9 +15,9 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PlayButtons extends StatelessWidget {
-  final QueryArtworkWidget artwork;
+  final String songId;
   final String songTitle;
-  PlayButtons({super.key, required this.artwork, required this.songTitle});
+  PlayButtons({super.key, required this.songId, required this.songTitle});
 
   final pController = Get.find<PlayerController>();
 
@@ -53,19 +53,18 @@ class PlayButtons extends StatelessWidget {
                     final prefs = await SharedPreferences.getInstance();
                     List<String> likedSongs =
                         prefs.getStringList('LikedSongs') ?? <String>[];
-                    String id = artwork.id.toString();
-                    if (likedSongs.contains(id)) {
-                      likedSongs.remove(id);
+                    if (likedSongs.contains(songId)) {
+                      likedSongs.remove(songId);
                       kShowToast('Song removed from liked songs');
                     } else {
-                      likedSongs.add(id);
+                      likedSongs.add(songId);
                       kShowToast('Song added to liked songs');
                     }
                     await prefs.setStringList('LikedSongs', likedSongs);
                     pController.update();
                   },
                   child: FutureBuilder(
-                      future: checkIsLiked(artwork.id.toString()),
+                      future: checkIsLiked(songId),
                       builder: (context, AsyncSnapshot snapshot) {
                         bool isLiked = snapshot.data ?? false;
                         return Icon(
@@ -148,7 +147,7 @@ class PlayButtons extends StatelessWidget {
               GestureDetector(
                 onTap: () async {
                   PlaybackState playbackState =
-                      await AudioServiceSingleton().handler.playbackState.last;
+                      AudioServiceSingleton().handler.playbackState.value;
                   bool playing = playbackState.playing;
                   if (playing) {
                     AudioServiceSingleton().handler.pause();

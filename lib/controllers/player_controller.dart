@@ -86,11 +86,11 @@ class PlayerController extends GetxController {
   int playCount = 0;
   addPlayCount() {
     playCount = playCount + 1;
-    if (playCount % 25 == 0) {
-      playCount = 0;
-      final adController = Get.find<AdController>();
-      adController.showInterstitial();
-    }
+    // if (playCount % 25 == 0) {
+    //   playCount = 0;
+    //   final adController = Get.find<AdController>();
+    //   adController.showInterstitial();
+    // }
   }
 
   List<MediaItem> queueList = [];
@@ -117,11 +117,14 @@ class PlayerController extends GetxController {
           album: each.album,
           artist: each.artist,
           artUri: File(filePath).uri,
+          duration: Duration(milliseconds: each.duration ?? 0),
         ));
         listToSave.add(each.getMap);
       }
-      AudioServiceSingleton().handler.updateQueue(queueList);
-      AudioServiceSingleton().handler.skipToQueueItem(index);
+      await AudioServiceSingleton().handler.updateQueue(queueList);
+      await Future.delayed(const Duration(milliseconds: 100), () {
+        AudioServiceSingleton().handler.skipToQueueItem(index);
+      });
       if (play != false) {
         final prefs = await SharedPreferences.getInstance();
         prefs.setString('last_play_list', jsonEncode(listToSave));
@@ -211,7 +214,7 @@ class PlayerController extends GetxController {
   }
 
   setWidgetData({required bool playing}) async {
-    MediaItem? mediaItem = await AudioServiceSingleton().handler.mediaItem.last;
+    MediaItem? mediaItem = AudioServiceSingleton().handler.mediaItem.value;
     if (mediaItem != null) {
       updateMusicWidget(
           title: mediaItem.title,

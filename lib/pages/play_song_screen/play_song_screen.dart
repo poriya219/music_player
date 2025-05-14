@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:MusicFlow/constans.dart';
 import 'package:MusicFlow/controllers/audio_service_singleton.dart';
 import 'package:MusicFlow/pages/play_song_screen/widgets/play_buttons.dart';
@@ -40,39 +42,6 @@ class PlaySongScreen extends StatelessWidget {
               stream: AudioServiceSingleton().handler.mediaItem,
               builder: (context, AsyncSnapshot snapshot) {
                 final MediaItem? mediaItem = snapshot.data;
-                // if (mediaItem == null) {
-                //   return SizedBox();
-                // }
-                QueryArtworkWidget artwork = snapshot.hasData
-                    ? QueryArtworkWidget(
-                        artworkBorder: const BorderRadius.only(
-                            bottomLeft: Radius.circular(40),
-                            topLeft: Radius.circular(40),
-                            topRight: Radius.circular(40)),
-                        artworkQuality: FilterQuality.high,
-                        nullArtworkWidget: ClipRRect(
-                          borderRadius: const BorderRadius.only(
-                              bottomLeft: Radius.circular(40),
-                              topLeft: Radius.circular(40),
-                              topRight: Radius.circular(40)),
-                          child: Image.asset(
-                            'assets/images/gd.png',
-                            height: 80.h,
-                            fit: BoxFit.fitHeight,
-                          ),
-                        ),
-                        size: 5000,
-                        quality: 100,
-                        format: ArtworkFormat.JPEG,
-                        id: int.parse(mediaItem != null ? mediaItem!.id : '0'),
-                        type: ArtworkType.AUDIO)
-                    : const QueryArtworkWidget(
-                        artworkBorder: BorderRadius.only(
-                            bottomLeft: Radius.circular(40),
-                            topLeft: Radius.circular(40),
-                            topRight: Radius.circular(40)),
-                        id: 0,
-                        type: ArtworkType.AUDIO);
                 String songTitle = snapshot.hasData
                     ? (mediaItem != null ? mediaItem.title : 'Unknown')
                     : 'Unknown';
@@ -144,7 +113,24 @@ class PlaySongScreen extends StatelessWidget {
                                     height: 85.w,
                                     child: Directionality(
                                         textDirection: TextDirection.ltr,
-                                        child: artwork),
+                                        child: ClipRRect(
+                                          borderRadius: const BorderRadius.only(
+                                            bottomLeft: Radius.circular(40),
+                                            topLeft: Radius.circular(40),
+                                            topRight: Radius.circular(40),
+                                          ),
+                                          child: mediaItem == null
+                                              ? Image.asset(
+                                                  'assets/images/gd.png',
+                                                  height: 80.h,
+                                                  fit: BoxFit.fitHeight,
+                                                )
+                                              : Image.file(
+                                                  File(mediaItem.artUri!.path),
+                                                  height: 80.h,
+                                                  fit: BoxFit.fitHeight,
+                                                ),
+                                        )),
                                   ),
                                 ),
                               ),
@@ -154,7 +140,9 @@ class PlaySongScreen extends StatelessWidget {
                               Directionality(
                                 textDirection: TextDirection.ltr,
                                 child: PlayButtons(
-                                  artwork: artwork,
+                                  songId: mediaItem != null
+                                      ? mediaItem.id
+                                      : 'Unknown',
                                   songTitle: songTitle,
                                 ),
                               ),
