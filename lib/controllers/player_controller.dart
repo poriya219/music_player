@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:MusicFlow/controllers/ad_controller.dart';
+import 'package:MusicFlow/controllers/equalizer_ui_controller.dart';
 import 'package:get/get.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:just_audio/just_audio.dart';
@@ -34,6 +35,10 @@ class PlayerController extends GetxController {
               List<IndexedAudioSource> list =
                   player.sequence ?? <IndexedAudioSource>[];
               String songTitle = list[event].tag.title;
+              int songId = int.tryParse(list[event].tag.id) ?? 0;
+              if (songId != currentId) {
+                setCurrentId(songId);
+              }
               int? id;
               final homeController = Get.find<HomeController>();
               for (var each in homeController.songs) {
@@ -90,6 +95,12 @@ class PlayerController extends GetxController {
       final adController = Get.find<AdController>();
       adController.showInterstitial();
     }
+  }
+
+  int currentId = 0;
+  setCurrentId(int id) {
+    currentId = id;
+    update();
   }
 
   sourceListGetter(
@@ -155,6 +166,10 @@ class PlayerController extends GetxController {
             stream3 = player.durationStream.listen((dEvent) async {});
           });
         });
+      }
+      final eqController = Get.put(EqualizerUiController());
+      if (eqController.isNull) {
+        eqController.init(i: 1);
       }
     }
   }

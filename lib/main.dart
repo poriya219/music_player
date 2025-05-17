@@ -126,10 +126,16 @@ class MyApp extends StatelessWidget {
   }
 }
 
+@pragma('vm:entry-point')
 Future<void> backgroundCallback(Uri? uri) async {
+  if (uri == null) return;
+
+  final String action = uri.host;
+
+  WidgetsFlutterBinding.ensureInitialized();
   print('action: ${uri?.host}');
   final playerController = Get.put(PlayerController());
-  switch (uri?.host) {
+  switch (action) {
     case 'play_pause':
       if (playerController.player.playing) {
         playerController.player.pause();
@@ -138,10 +144,10 @@ Future<void> backgroundCallback(Uri? uri) async {
       }
       break;
     case 'next':
-      // next track
+      playerController.player.seekToNext();
       break;
     case 'previous':
-      // previous track
+      playerController.player.seekToPrevious();
       break;
     case 'like':
       // toggle like

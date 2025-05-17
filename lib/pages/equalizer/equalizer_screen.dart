@@ -24,7 +24,15 @@ class EqualizerScreen extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 5.w),
         child: Obx(() {
           return controller.bands.isEmpty
-              ? const Center(child: CircularProgressIndicator())
+              ? (controller.isNull
+                  ? Center(
+                      child: Text(
+                        't28'.tr,
+                        style: TextStyle(
+                            fontSize: 16.sp, fontWeight: FontWeight.w500),
+                      ),
+                    )
+                  : const Center(child: CircularProgressIndicator()))
               : Column(
                   children: [
                     Row(

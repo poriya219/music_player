@@ -6,6 +6,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:mini_music_visualizer/mini_music_visualizer.dart';
 import 'package:on_audio_query_forked/on_audio_query.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -246,6 +247,21 @@ class ListDetail extends StatelessWidget {
                   ],
                 ),
               ),
+              GetBuilder<PlayerController>(builder: (plController) {
+                return (plController.player.playing &&
+                        plController.currentId == song.id)
+                    ? Padding(
+                        padding: const EdgeInsets.only(bottom: 2),
+                        child: MiniMusicVisualizer(
+                          color: kBlueColor,
+                          width: 6,
+                          height: 13,
+                          animate: true,
+                          // height: 15,
+                        ),
+                      )
+                    : const SizedBox();
+              }),
               // if (mode != ListDetailMode.playlist) ...{
               DropdownButtonHideUnderline(
                 child: DropdownButton2(

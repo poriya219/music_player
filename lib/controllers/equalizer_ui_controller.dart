@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:MusicFlow/controllers/player_controller.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,6 +12,12 @@ class EqualizerUiController extends GetxController {
     super.onInit();
   }
 
+  bool isNull = false;
+  setIsNull(bool value) {
+    isNull = value;
+    update();
+  }
+
   final equalizer = EqualizerController();
 
   var bands = <int>[].obs;
@@ -18,17 +26,26 @@ class EqualizerUiController extends GetxController {
   var selectedPreset = 0.obs;
   var enabled = false.obs;
 
-  Future<void> init() async {
+  Future<void> init({int? i}) async {
     final playerController = Get.put(PlayerController());
     int? sessionId = playerController.player.androidAudioSessionId;
     if (sessionId == null) {
+      setIsNull(true);
+      print('player id: is null');
+      if (i != null) {
+        Timer(const Duration(seconds: 1), () => init());
+      }
       return;
     }
+    print('player id: $sessionId');
     await equalizer.init(sessionId);
     bands.value = await equalizer.getBandLevels();
     freqs.value = await equalizer.getCenterFrequencies();
     presets.value = await equalizer.getPresets();
     await loadSettings();
+    if (isNull) {
+      setIsNull(false);
+    }
   }
 
   void toggleEnable() async {

@@ -44,16 +44,16 @@ class MusicWidgetProvider : AppWidgetProvider() {
                 if (isPlaying) R.drawable.pa else R.drawable.p
             )
 
-            views.setImageViewResource(
-                R.id.btn_like,
-                if (isLiked) R.drawable.liked else R.drawable.like
-            )
+            // views.setImageViewResource(
+            //     R.id.btn_like,
+            //     if (isLiked) R.drawable.liked else R.drawable.like
+            // )
 
             // دکمه‌ها با PendingIntent که به MainActivity می‌روند
             views.setOnClickPendingIntent(R.id.btn_play_pause, getPendingIntent(context, "myAppWidget://play_pause"))
             views.setOnClickPendingIntent(R.id.btn_next, getPendingIntent(context, "myAppWidget://next"))
             views.setOnClickPendingIntent(R.id.btn_previous, getPendingIntent(context, "myAppWidget://previous"))
-            views.setOnClickPendingIntent(R.id.btn_like, getPendingIntent(context, "myAppWidget://like"))
+            // views.setOnClickPendingIntent(R.id.btn_like, getPendingIntent(context, "myAppWidget://like"))
 
             appWidgetManager.updateAppWidget(widgetId, views)
         }

@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:MusicFlow/controllers/app_controller.dart';
 import 'package:MusicFlow/controllers/player_controller.dart';
 import 'package:MusicFlow/pages/home_screen/controller/home_controller.dart';
+import 'package:mini_music_visualizer/mini_music_visualizer.dart';
 import 'package:on_audio_query_forked/on_audio_query.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -240,9 +241,29 @@ class SongsList extends StatelessWidget {
             SizedBox(
               width: 5.w,
             ),
-            Text(
-              controller.durationGenerator(song.duration ?? 0),
-              style: TextStyle(color: kTextGreyColor),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GetBuilder<PlayerController>(builder: (plController) {
+                  return (plController.player.playing &&
+                          plController.currentId == song.id)
+                      ? Padding(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: MiniMusicVisualizer(
+                            color: kBlueColor,
+                            width: 6,
+                            height: 13,
+                            animate: true,
+                            // height: 15,
+                          ),
+                        )
+                      : const SizedBox();
+                }),
+                Text(
+                  controller.durationGenerator(song.duration ?? 0),
+                  style: TextStyle(color: kTextGreyColor),
+                ),
+              ],
             ),
             SizedBox(
               width: 3.w,

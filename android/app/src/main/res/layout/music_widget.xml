@@ -78,13 +78,13 @@
                 android:src="@drawable/n"
                 android:contentDescription="Next" />
 
-            <ImageView
+            <!-- <ImageView
                 android:id="@+id/btn_like"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:src="@drawable/like"
-                android:contentDescription="Like" />
+                android:contentDescription="Like" /> -->
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

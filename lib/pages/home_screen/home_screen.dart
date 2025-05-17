@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:MusicFlow/controllers/equalizer_ui_controller.dart';
 import 'package:MusicFlow/pages/equalizer/equalizer_screen.dart';
 import 'package:MusicFlow/pages/find_screen/find_song_screen.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
@@ -464,6 +465,15 @@ class HomeScreen extends StatelessWidget {
                                                                 playerController
                                                                     .player
                                                                     .play();
+                                                                final eqController =
+                                                                    Get.put(
+                                                                        EqualizerUiController());
+                                                                if (eqController
+                                                                    .isNull) {
+                                                                  eqController
+                                                                      .init(
+                                                                          i: 1);
+                                                                }
                                                               }
                                                             },
                                                             child: Icon(

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:MusicFlow/constans.dart';
+import 'package:MusicFlow/controllers/equalizer_ui_controller.dart';
 import 'package:MusicFlow/controllers/player_controller.dart';
 import 'package:MusicFlow/pages/home_screen/controller/home_controller.dart';
 import 'package:MusicFlow/pages/play_song_screen/widgets/play_slider.dart';
@@ -145,6 +146,10 @@ class PlayButtons extends StatelessWidget {
                     player.pause();
                   } else {
                     player.play();
+                    final eqController = Get.put(EqualizerUiController());
+                    if (eqController.isNull) {
+                      eqController.init(i: 1);
+                    }
                   }
                 },
                 child: CircleAvatar(

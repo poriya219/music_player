@@ -1,4 +1,5 @@
 import 'package:MusicFlow/constans.dart';
+import 'package:MusicFlow/pages/equalizer/equalizer_screen.dart';
 import 'package:MusicFlow/pages/play_song_screen/widgets/play_buttons.dart';
 import 'package:MusicFlow/pages/play_song_screen/widgets/play_slider.dart';
 import 'package:MusicFlow/pages/play_song_screen/widgets/similar_tracks.dart';
@@ -133,6 +134,17 @@ class PlaySongScreen extends StatelessWidget {
                                   ),
                                   SizedBox(
                                     width: 10.w,
+                                    child: IconButton(
+                                      onPressed: () {
+                                        Get.to(() => EqualizerScreen());
+                                      },
+                                      icon: Icon(
+                                        EvaIcons.options2Outline,
+                                        color:
+                                            Theme.of(Get.context!).primaryColor,
+                                        size: 7.w,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
